@@ -3,33 +3,29 @@ package com.finki.courses.Fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
-import com.finki.courses.databinding.FragmentUserBinding;
+import com.finki.courses.databinding.FragmentGalleryBinding;
 
 
-public class FragmentUser extends Fragment implements IEssentials {
+public class FragmentGallery extends Fragment implements IEssentials {
 
-    private FragmentUserBinding binding;
+    private FragmentGalleryBinding binding;
     private Toaster toaster;
-    private MainActivityHelper mainActivityHelper;
 
-    public FragmentUser() {}
-    public FragmentUser(MainActivityHelper mainActivityHelper){
-        this.mainActivityHelper = mainActivityHelper;
+    public FragmentGallery() {
+        // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentUserBinding.bind(inflater.inflate(R.layout.fragment_user, container, false));
+        binding = FragmentGalleryBinding.bind(inflater.inflate(R.layout.fragment_gallery, container, false));
 
         instantiateObjects();
         additionalThemeChanges();
@@ -41,14 +37,11 @@ public class FragmentUser extends Fragment implements IEssentials {
     @Override
     public void instantiateObjects() {
         toaster = new Toaster(getContext());
+        toaster.text("New gallery");
     }
 
     @Override
     public void addEventListeners() {
-        binding.buttonViewAll.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentGallery());
-            mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemGallery);
-        });
     }
 
     @Override

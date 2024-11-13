@@ -1,6 +1,5 @@
 package com.finki.courses.Activities;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,13 +10,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.finki.courses.Fragments.FragmentGallery;
 import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Fragments.FragmentUser;
-import com.finki.courses.Helper.ActivityHelpers.MainActivityHelper;
+import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
 import com.finki.courses.databinding.ActivityMainBinding;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends ParentActivity {
@@ -27,6 +26,7 @@ public class MainActivity extends ParentActivity {
     private Toaster toaster;
     private FragmentHome fragmentHome;
     private FragmentUser fragmentUser;
+    private FragmentGallery fragmentGallery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +49,14 @@ public class MainActivity extends ParentActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        mainActivityHelper = new MainActivityHelper(MainActivity.this, this, binding);
+
         fragmentHome = new FragmentHome();
-        fragmentUser = new FragmentUser();
+        fragmentUser = new FragmentUser(mainActivityHelper);
+        fragmentGallery = new FragmentGallery();
 
         toaster = new Toaster(MainActivity.this);
 
-        mainActivityHelper = new MainActivityHelper(MainActivity.this, this, binding);
         mainActivityHelper.changeFragments(fragmentHome);
         binding.bottomNavigationView.setSelectedItemId(R.id.itemHome);
     }
@@ -65,17 +67,6 @@ public class MainActivity extends ParentActivity {
             toaster.text("Hello there");
         });
 
-        binding.searchBarMainActivity.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus){
-                    mainActivityHelper.hideLogoAndTitle();
-                } else {
-                    mainActivityHelper.showLogoAndTitle();
-                }
-            }
-        });
-
         binding.bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -83,6 +74,8 @@ public class MainActivity extends ParentActivity {
                     mainActivityHelper.changeFragments(fragmentHome);
                 } else if (item.getItemId() == R.id.itemUser){
                     mainActivityHelper.changeFragments(fragmentUser);
+                } else if (item.getItemId() == R.id.itemGallery){
+                    mainActivityHelper.changeFragments(fragmentGallery);
                 }
                 return true;
             }

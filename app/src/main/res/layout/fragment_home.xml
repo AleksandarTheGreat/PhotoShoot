@@ -3,11 +3,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.FragmentHome">
 
-    <ScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerLayoutMainActivity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageViewLogo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginVertical="12dp"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Title"
+            android:textSize="22sp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/imageViewLogo"
+            app:layout_constraintTop_toTopOf="@id/imageViewLogo"
+            app:layout_constraintBottom_toBottomOf="@id/imageViewLogo"
+            />
+
+        <SearchView
+            android:id="@+id/searchBarFragmentHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:id="@+id/scrollViewFragmentHome"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:layout_below="@id/headerLayoutMainActivity">
 
         <LinearLayout
             android:id="@+id/linearLayoutCategories"
@@ -15,253 +60,50 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="Hello there"
-                android:textSize="20sp"
-                android:layout_margin="12dp"
-                />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginBottom="24dp"
-                >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
-
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="Hello there"
-                android:textSize="20sp"
-                android:layout_margin="12dp"
-                />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginBottom="24dp"
-                >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
-
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="Hello there"
-                android:textSize="20sp"
-                android:layout_margin="12dp"
-                />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginBottom="24dp"
-                >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
-
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="Hello there"
-                android:textSize="20sp"
-                android:layout_margin="12dp"
-                />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginBottom="24dp"
-                >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="150dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="4dp"
-                        />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
-
         </LinearLayout>
 
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutEmptyList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@mipmap/ic_launcher"
+            android:layout_marginBottom="24dp"
+            />
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:text="Empty list"
+            android:layout_marginBottom="4dp"
+            />
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="18sp"
+            android:text="You have no categories yet"
+            android:layout_marginBottom="8dp"
+            />
+
+        <Button
+            android:id="@+id/buttonAddCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add a category"
+            />
+
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButtonAddCategory"

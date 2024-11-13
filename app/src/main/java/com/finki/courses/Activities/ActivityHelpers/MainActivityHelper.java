@@ -1,4 +1,4 @@
-package com.finki.courses.Helper.ActivityHelpers;
+package com.finki.courses.Activities.ActivityHelpers;
 
 import android.content.Context;
 import android.view.View;
@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.finki.courses.Fragments.FragmentGallery;
 import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Fragments.FragmentUser;
 import com.finki.courses.R;
@@ -27,27 +28,23 @@ public class MainActivityHelper {
         this.appCompatActivity = appCompatActivity;
     }
 
-    public void hideLogoAndTitle(){
-        binding.imageViewLogo.setVisibility(View.GONE);
-        binding.textViewTitle.setVisibility(View.GONE);
-    }
-
-    public void showLogoAndTitle(){
-        binding.imageViewLogo.setVisibility(View.VISIBLE);
-        binding.textViewTitle.setVisibility(View.VISIBLE);
-    }
-
     public void changeFragments(Fragment fragment){
 //        if (fragment instanceof FragmentUser)
 //            binding.bottomNavigationView.setSelectedItemId(R.id.itemUser);
 //        else if (fragment instanceof FragmentHome)
 //            binding.bottomNavigationView.setSelectedItemId(R.id.itemHome);
+//        else if (fragment instanceof FragmentGallery)
+//            binding.bottomNavigationView.setSelectedItemId(R.id.itemGallery);
 
         FragmentManager fragmentManager = appCompatActivity.getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
                 .commit();
 
+    }
+
+    public ActivityMainBinding getBinding(){
+        return binding;
     }
 
 }

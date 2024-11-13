@@ -7,52 +7,10 @@
     android:layout_height="match_parent"
     tools:context=".Activities.MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/headerLayoutMainActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/imageViewLogo"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginVertical="12dp"
-            android:src="@mipmap/ic_launcher"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-
-        <TextView
-            android:id="@+id/textViewTitle"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Title"
-            android:textSize="22sp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@id/imageViewLogo"
-            app:layout_constraintTop_toTopOf="@id/imageViewLogo"
-            app:layout_constraintBottom_toBottomOf="@id/imageViewLogo"
-            />
-
-        <SearchView
-            android:id="@+id/searchBarMainActivity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerViewMainActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/headerLayoutMainActivity"
         android:layout_above="@id/bottomNavigationView"
         />
 
