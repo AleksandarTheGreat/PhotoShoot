@@ -51,7 +51,6 @@ public class FragmentHome extends Fragment implements IEssentials {
         // Load all the categories
         // Create the layouts
 
-
         // if (categories are empty)
         fragmentHomeHelper.hideScrollViewAndShowLinearLayout();
         // else

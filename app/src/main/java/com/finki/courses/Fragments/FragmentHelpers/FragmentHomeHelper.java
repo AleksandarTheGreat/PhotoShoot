@@ -78,7 +78,7 @@ public class FragmentHomeHelper {
                         // Take the now saved category
 
                         showScrollViewAndHideLinearLayout();
-                        createAWholeCategoryLayout(text, false);
+                        createAWholeCategoryLayout(text, true);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

@@ -40,7 +40,6 @@ public class MainActivityHelper {
         fragmentManager.beginTransaction()
                 .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
                 .commit();
-
     }
 
     public ActivityMainBinding getBinding(){
