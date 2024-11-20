@@ -8,8 +8,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
+import com.finki.courses.Fragments.FragmentAddPost;
 import com.finki.courses.Fragments.FragmentGallery;
 import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Fragments.FragmentUser;
@@ -29,17 +31,18 @@ public class MainActivityHelper {
     }
 
     public void changeFragments(Fragment fragment){
-//        if (fragment instanceof FragmentUser)
-//            binding.bottomNavigationView.setSelectedItemId(R.id.itemUser);
-//        else if (fragment instanceof FragmentHome)
-//            binding.bottomNavigationView.setSelectedItemId(R.id.itemHome);
-//        else if (fragment instanceof FragmentGallery)
-//            binding.bottomNavigationView.setSelectedItemId(R.id.itemGallery);
-
         FragmentManager fragmentManager = appCompatActivity.getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
-                .commit();
+        if (fragment instanceof FragmentAddPost){
+            fragmentManager.beginTransaction()
+                    .addToBackStack("stack1")
+                    .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
+                    .commit();
+        } else {
+            fragmentManager.popBackStack();
+            fragmentManager.beginTransaction()
+                    .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
+                    .commit();
+        }
     }
 
     public ActivityMainBinding getBinding(){
@@ -47,10 +50,6 @@ public class MainActivityHelper {
     }
 
 }
-
-
-
-
 
 
 

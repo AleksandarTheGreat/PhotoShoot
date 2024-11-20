@@ -51,7 +51,7 @@ public class MainActivity extends ParentActivity {
 
         mainActivityHelper = new MainActivityHelper(MainActivity.this, this, binding);
 
-        fragmentHome = new FragmentHome();
+        fragmentHome = new FragmentHome(mainActivityHelper);
         fragmentUser = new FragmentUser(mainActivityHelper);
         fragmentGallery = new FragmentGallery();
 

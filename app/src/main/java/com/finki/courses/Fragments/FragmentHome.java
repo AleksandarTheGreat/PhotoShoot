@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentHelpers.FragmentHomeHelper;
 import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
@@ -27,9 +28,14 @@ public class FragmentHome extends Fragment implements IEssentials {
     private FragmentHomeBinding binding;
     private Toaster toaster;
     private FragmentHomeHelper fragmentHomeHelper;
+    private MainActivityHelper mainActivityHelper;
 
     public FragmentHome() {
         // Required empty public constructor
+    }
+
+    public FragmentHome(MainActivityHelper mainActivityHelper){
+        this.mainActivityHelper = mainActivityHelper;
     }
 
     @Override
@@ -46,7 +52,7 @@ public class FragmentHome extends Fragment implements IEssentials {
     @Override
     public void instantiateObjects() {
         toaster = new Toaster(getContext());
-        fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, toaster);
+        fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, mainActivityHelper, toaster);
 
         // Load all the categories
         // Create the layouts

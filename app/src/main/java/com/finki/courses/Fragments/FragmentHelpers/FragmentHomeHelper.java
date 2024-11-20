@@ -16,6 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
+import com.finki.courses.Fragments.FragmentAddPost;
+import com.finki.courses.Fragments.FragmentGallery;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
 import com.finki.courses.databinding.FragmentHomeBinding;
@@ -25,14 +28,18 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import org.w3c.dom.Text;
 
+import java.util.concurrent.locks.ReadWriteLock;
+
 public class FragmentHomeHelper {
 
     private Context context;
     private FragmentHomeBinding binding;
+    private MainActivityHelper mainActivityHelper;
     private Toaster toaster;
-    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, Toaster toaster){
+    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, MainActivityHelper mainActivityHelper, Toaster toaster){
         this.context = context;
         this.binding = binding;
+        this.mainActivityHelper = mainActivityHelper;
         this.toaster = toaster;
     }
 
@@ -78,7 +85,7 @@ public class FragmentHomeHelper {
                         // Take the now saved category
 
                         showScrollViewAndHideLinearLayout();
-                        createAWholeCategoryLayout(text, true);
+                        createAWholeCategoryLayout(text, false);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -97,25 +104,27 @@ public class FragmentHomeHelper {
 
         // If the category list is empty
         if (isEmpty){
+            // This will be used when I am creating a new category
             createEmptyLayout();
         } else {
+            // This will be used when I am iterating over the categories
             createPostsLayout();
         }
     }
 
     private void createAHeaderForCategory(String title){
         LinearLayout.LayoutParams layoutParamsLinearHeader = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsLinearHeader.setMargins(48, 0, 48, 32);
+        layoutParamsLinearHeader.setMargins(48, 0, 48, 42);
 
-        LinearLayout linearLayoutHeader = new LinearLayout(context);
-        linearLayoutHeader.setLayoutParams(layoutParamsLinearHeader);
-        linearLayoutHeader.setOrientation(LinearLayout.VERTICAL);
-        linearLayoutHeader.setGravity(Gravity.START);
-
+        RelativeLayout relativeLayoutHeader = new RelativeLayout(context);
+        relativeLayoutHeader.setLayoutParams(layoutParamsLinearHeader);
+        relativeLayoutHeader.setGravity(Gravity.START);
 
 
-        LinearLayout.LayoutParams layoutParamsTextView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        RelativeLayout.LayoutParams layoutParamsTextView = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsTextView.setMargins(0, 0, 0, 24);
+        layoutParamsTextView.addRule(RelativeLayout.CENTER_VERTICAL);
 
         TextView textViewCategoryTitle = new TextView(context);
         textViewCategoryTitle.setTextSize(18);
@@ -124,22 +133,56 @@ public class FragmentHomeHelper {
         textViewCategoryTitle.setLayoutParams(layoutParamsTextView);
 
 
+        // Icon view all
+        RelativeLayout.LayoutParams layoutParamsImageIcon1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsImageIcon1.setMargins(8, 0, 8, 0);
+        layoutParamsImageIcon1.addRule(RelativeLayout.ALIGN_PARENT_END);
+        layoutParamsImageIcon1.addRule(RelativeLayout.CENTER_VERTICAL);
 
-        LinearLayout.LayoutParams layoutParamsButtonViewAll = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsButtonViewAll.setMargins(0, 0, 0, 0);
-
-        TextView textViewViewAll = new TextView(context);
-        textViewViewAll.setText("View all");
-        textViewViewAll.setTextSize(14);
-        textViewViewAll.setTextColor(Color.BLUE);
-        textViewViewAll.setLayoutParams(layoutParamsButtonViewAll);
-
+        ImageView imageViewIconViewAll = new ImageView(context);
+        imageViewIconViewAll.setId(View.generateViewId());
+        imageViewIconViewAll.setImageResource(R.drawable.ic_test);
+        imageViewIconViewAll.setLayoutParams(layoutParamsImageIcon1);
+        imageViewIconViewAll.setOnClickListener(view -> {
+            mainActivityHelper.changeFragments(new FragmentGallery());
+        });
 
 
-        linearLayoutHeader.addView(textViewCategoryTitle);
-        linearLayoutHeader.addView(textViewViewAll);
+        // Icon add post
+        RelativeLayout.LayoutParams layoutParamsImageIcon2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsImageIcon2.setMargins(8, 0, 8, 0);
+        layoutParamsImageIcon2.addRule(RelativeLayout.LEFT_OF, imageViewIconViewAll.getId());
+        layoutParamsImageIcon2.addRule(RelativeLayout.CENTER_VERTICAL);
 
-        binding.linearLayoutCategories.addView(linearLayoutHeader);
+        ImageView imageViewIconAddPost = new ImageView(context);
+        imageViewIconAddPost.setId(View.generateViewId());
+        imageViewIconAddPost.setImageResource(R.drawable.ic_test);
+        imageViewIconAddPost.setLayoutParams(layoutParamsImageIcon2);
+        imageViewIconAddPost.setOnClickListener(view -> {
+            mainActivityHelper.changeFragments(new FragmentAddPost());
+        });
+
+
+        // Icon delete category
+        RelativeLayout.LayoutParams layoutParamsImageIcon3 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsImageIcon3.setMargins(8, 0, 8, 0);
+        layoutParamsImageIcon3.addRule(RelativeLayout.LEFT_OF, imageViewIconAddPost.getId());
+        layoutParamsImageIcon3.addRule(RelativeLayout.CENTER_VERTICAL);
+
+        ImageView imageViewIconDelete = new ImageView(context);
+        imageViewIconDelete.setId(View.generateViewId());
+        imageViewIconDelete.setImageResource(R.drawable.ic_test);
+        imageViewIconDelete.setLayoutParams(layoutParamsImageIcon3);
+
+
+
+
+        relativeLayoutHeader.addView(imageViewIconViewAll);
+        relativeLayoutHeader.addView(imageViewIconAddPost);
+        relativeLayoutHeader.addView(imageViewIconDelete);
+        relativeLayoutHeader.addView(textViewCategoryTitle);
+
+        binding.linearLayoutCategories.addView(relativeLayoutHeader);
     }
 
     private void createEmptyLayout(){
@@ -178,7 +221,7 @@ public class FragmentHomeHelper {
         Button button = new Button(context);
         button.setText("Create a post");
         button.setOnClickListener(view -> {
-            toaster.text("Not ready yet, bae");
+            mainActivityHelper.changeFragments(new FragmentAddPost());
         });
         button.setLayoutParams(layoutParamsButton);
 
