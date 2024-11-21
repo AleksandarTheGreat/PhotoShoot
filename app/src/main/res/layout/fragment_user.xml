@@ -28,6 +28,7 @@
             />
 
         <TextView
+            android:id="@+id/textViewEmail"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:text="Email goes here"
@@ -52,7 +53,16 @@
             android:id="@+id/buttonViewAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="View all"
+            />
+
+        <Button
+            android:id="@+id/buttonSignOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign out"
+            style="@style/Widget.Material3.Button.TextButton"
             />
 
     </LinearLayout>

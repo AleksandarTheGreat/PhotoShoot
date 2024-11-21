@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "208401456159",
+    "project_id": "social101-12725",
+    "storage_bucket": "social101-12725.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:208401456159:android:e408b53abf59d047a1c92a",
+        "android_client_info": {
+          "package_name": "com.finki.courses"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB783Vmt3YfZ2VTq5d7wVbVaLLkEFp4uOY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

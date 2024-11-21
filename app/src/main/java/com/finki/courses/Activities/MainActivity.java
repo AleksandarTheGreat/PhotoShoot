@@ -1,6 +1,8 @@
 package com.finki.courses.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -18,6 +20,8 @@ import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
 import com.finki.courses.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends ParentActivity {
 
@@ -27,6 +31,7 @@ public class MainActivity extends ParentActivity {
     private FragmentHome fragmentHome;
     private FragmentUser fragmentUser;
     private FragmentGallery fragmentGallery;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,18 @@ public class MainActivity extends ParentActivity {
 
     @Override
     public void instantiateObjects() {
+        // validate current user before anything else
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user == null){
+            Log.d("Tag", "Current user is null");
+            Intent openLoginActivity = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(openLoginActivity);
+            finish();
+        } else {
+            Log.d("Tag", "'" + user.getEmail() + "' is signed in");
+        }
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

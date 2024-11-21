@@ -2,19 +2,22 @@ package com.finki.courses.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.finki.courses.R;
-import com.finki.courses.databinding.ActivitySignupLoginBinding;
+import com.finki.courses.Repositories.AuthenticationRepository;
+import com.finki.courses.databinding.ActivityLoginBinding;
+import com.google.firebase.auth.FirebaseAuth;
 
-public class SignupLoginActivity extends ParentActivity {
+public class LoginActivity extends ParentActivity {
 
-    private ActivitySignupLoginBinding binding;
+    private ActivityLoginBinding binding;
+    private AuthenticationRepository authenticationRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,16 +37,24 @@ public class SignupLoginActivity extends ParentActivity {
 
     @Override
     public void instantiateObjects() {
-        binding = ActivitySignupLoginBinding.inflate(getLayoutInflater());
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        authenticationRepository = new AuthenticationRepository(LoginActivity.this);
     }
 
     @Override
     public void addEventListeners() {
-        binding.buttonLoginSignup.setOnClickListener(view -> {
-            Intent intentGoToMainActivity = new Intent(SignupLoginActivity.this, MainActivity.class);
-            startActivity(intentGoToMainActivity);
-            finish();
+        binding.buttonLogin.setOnClickListener(view -> {
+            String email = binding.textInputEditTextEmail.getText().toString().trim();
+            String password = binding.textInputEditTextPassword.getText().toString().trim();
+
+            authenticationRepository.loginUser(email, password, binding);
+        });
+
+        binding.textViewDontHaveAnAccount.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+            startActivity(intent);
         });
     }
 
