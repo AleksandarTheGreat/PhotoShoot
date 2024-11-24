@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,54 +17,59 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
 import com.finki.courses.Fragments.FragmentGallery;
 import com.finki.courses.Helper.Implementations.Toaster;
+import com.finki.courses.Model.Category;
+import com.finki.courses.Model.Post;
+import com.finki.courses.Model.User;
 import com.finki.courses.R;
+import com.finki.courses.Repositories.Implementations.CategoryRepository;
 import com.finki.courses.databinding.FragmentHomeBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.stream.Collectors;
 
 public class FragmentHomeHelper {
 
     private Context context;
     private FragmentHomeBinding binding;
     private MainActivityHelper mainActivityHelper;
+
+    private CategoryRepository categoryRepository;
     private Toaster toaster;
-    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, MainActivityHelper mainActivityHelper, Toaster toaster){
+
+    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, MainActivityHelper mainActivityHelper, Toaster toaster) {
         this.context = context;
         this.binding = binding;
         this.mainActivityHelper = mainActivityHelper;
+
+        this.categoryRepository = new CategoryRepository(context, this);
         this.toaster = toaster;
     }
 
-    public void showLogoAndTitle(){
-        binding.imageViewLogo.setVisibility(View.VISIBLE);
-        binding.textViewTitle.setVisibility(View.VISIBLE);
-    }
-
-    public void hideLogoAndTitle(){
-        binding.imageViewLogo.setVisibility(View.GONE);
-        binding.textViewTitle.setVisibility(View.GONE);
-    }
-
-    public void showScrollViewAndHideLinearLayout(){
-        binding.scrollViewFragmentHome.setVisibility(View.VISIBLE);
-        binding.linearLayoutEmptyList.setVisibility(View.INVISIBLE);
-    }
-
-    public void hideScrollViewAndShowLinearLayout(){
-        binding.scrollViewFragmentHome.setVisibility(View.INVISIBLE);
-        binding.linearLayoutEmptyList.setVisibility(View.VISIBLE);
-    }
-
-    public void showCategoryInputDialog(){
+    public void showCategoryInputDialog() {
         @SuppressLint("InflateParams") View inputView = LayoutInflater.from(context)
                 .inflate(R.layout.input_category_layout, null);
 
@@ -81,11 +87,12 @@ public class FragmentHomeHelper {
                             return;
 
                         // Save the new category to firebase
-                        toaster.text(text + " saved nagjomiti");
                         // Take the now saved category
 
+                        categoryRepository.add(text);
+
                         showScrollViewAndHideLinearLayout();
-                        createAWholeCategoryLayout(text, false);
+                        createAWholeCategoryLayout(new Category(text, new ArrayList<>()));
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -99,27 +106,24 @@ public class FragmentHomeHelper {
                 .show();
     }
 
-    public void createAWholeCategoryLayout(String title, boolean isEmpty){
-        createAHeaderForCategory(title);
+    public void createAWholeCategoryLayout(Category category) {
+        binding.linearLayoutCategories.removeAllViews();
+        createAHeaderForCategory(category.getName());
 
-        // If the category list is empty
-        if (isEmpty){
-            // This will be used when I am creating a new category
+        if (category.getPostList().isEmpty()) {
             createEmptyLayout();
         } else {
-            // This will be used when I am iterating over the categories
-            createPostsLayout();
+            createPostsLayout(category.getPostList());
         }
     }
 
-    private void createAHeaderForCategory(String title){
+    private void createAHeaderForCategory(String title) {
         LinearLayout.LayoutParams layoutParamsLinearHeader = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearHeader.setMargins(48, 0, 48, 42);
 
         RelativeLayout relativeLayoutHeader = new RelativeLayout(context);
         relativeLayoutHeader.setLayoutParams(layoutParamsLinearHeader);
         relativeLayoutHeader.setGravity(Gravity.START);
-
 
 
         RelativeLayout.LayoutParams layoutParamsTextView = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -145,6 +149,7 @@ public class FragmentHomeHelper {
         imageViewIconViewAll.setLayoutParams(layoutParamsImageIcon1);
         imageViewIconViewAll.setOnClickListener(view -> {
             mainActivityHelper.changeFragments(new FragmentGallery());
+            mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemGallery);
         });
 
 
@@ -175,8 +180,6 @@ public class FragmentHomeHelper {
         imageViewIconDelete.setLayoutParams(layoutParamsImageIcon3);
 
 
-
-
         relativeLayoutHeader.addView(imageViewIconViewAll);
         relativeLayoutHeader.addView(imageViewIconAddPost);
         relativeLayoutHeader.addView(imageViewIconDelete);
@@ -184,8 +187,7 @@ public class FragmentHomeHelper {
 
         binding.linearLayoutCategories.addView(relativeLayoutHeader);
     }
-
-    private void createEmptyLayout(){
+    private void createEmptyLayout() {
         LinearLayout.LayoutParams layoutParamsLinearLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearLayout.setMargins(48, 0, 48, 64);
 
@@ -195,18 +197,16 @@ public class FragmentHomeHelper {
         linearLayout.setLayoutParams(layoutParamsLinearLayout);
 
 
-
         LinearLayout.LayoutParams layoutParamsImageView = new LinearLayout.LayoutParams(300, 300);
-        layoutParamsImageView.setMargins(0, 0,0, 48);
+        layoutParamsImageView.setMargins(0, 0, 0, 48);
 
         ImageView imageView = new ImageView(context);
         imageView.setImageResource(R.mipmap.ic_launcher);
         imageView.setLayoutParams(layoutParamsImageView);
 
 
-
         LinearLayout.LayoutParams layoutParamsTextView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsTextView.setMargins(0,0,0,24);
+        layoutParamsTextView.setMargins(0, 0, 0, 24);
 
         TextView textViewNoPostsYet = new TextView(context);
         textViewNoPostsYet.setText("Sadly, you have no posts yet");
@@ -214,9 +214,8 @@ public class FragmentHomeHelper {
         textViewNoPostsYet.setLayoutParams(layoutParamsTextView);
 
 
-
         LinearLayout.LayoutParams layoutParamsButton = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsButton.setMargins(0,0,0,24);
+        layoutParamsButton.setMargins(0, 0, 0, 24);
 
         Button button = new Button(context);
         button.setText("Create a post");
@@ -226,16 +225,13 @@ public class FragmentHomeHelper {
         button.setLayoutParams(layoutParamsButton);
 
 
-
         linearLayout.addView(imageView);
         linearLayout.addView(textViewNoPostsYet);
         linearLayout.addView(button);
 
         binding.linearLayoutCategories.addView(linearLayout);
     }
-
-
-    private void createPostsLayout(){
+    private void createPostsLayout(List<Post> postList) {
         LinearLayout.LayoutParams layoutParamsHorizontalScrollView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
         layoutParamsHorizontalScrollView.setMargins(48, 0, 48, 64);
 
@@ -250,12 +246,12 @@ public class FragmentHomeHelper {
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setLayoutParams(layoutParamsLinearLayout);
 
-        for (int i=0;i<6;i++){
+        for (int i = 0; i < postList.size(); i++) {
             LinearLayout.LayoutParams layoutParamsMaterialCardView = new LinearLayout.LayoutParams(350, ViewGroup.LayoutParams.MATCH_PARENT);
 
-            if (i == 0){
+            if (i == 0) {
                 layoutParamsMaterialCardView.setMargins(0, 0, 16, 0);
-            } else if (i == 5){
+            } else if (i == 5) {
                 layoutParamsMaterialCardView.setMargins(16, 0, 0, 0);
             } else {
                 layoutParamsMaterialCardView.setMargins(16, 0, 16, 0);
@@ -280,6 +276,28 @@ public class FragmentHomeHelper {
         horizontalScrollView.addView(linearLayout);
         binding.linearLayoutCategories.addView(horizontalScrollView);
     }
+
+
+    public void showLogoAndTitle() {
+        binding.imageViewLogo.setVisibility(View.VISIBLE);
+        binding.textViewTitle.setVisibility(View.VISIBLE);
+    }
+
+    public void hideLogoAndTitle() {
+        binding.imageViewLogo.setVisibility(View.GONE);
+        binding.textViewTitle.setVisibility(View.GONE);
+    }
+
+    public void showScrollViewAndHideLinearLayout() {
+        binding.scrollViewFragmentHome.setVisibility(View.VISIBLE);
+        binding.linearLayoutEmptyList.setVisibility(View.INVISIBLE);
+    }
+
+    public void hideScrollViewAndShowLinearLayout() {
+        binding.scrollViewFragmentHome.setVisibility(View.INVISIBLE);
+        binding.linearLayoutEmptyList.setVisibility(View.VISIBLE);
+    }
+
 }
 
 

@@ -1,21 +1,18 @@
 package com.finki.courses.Fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
-import com.finki.courses.Activities.LoginActivity;
 import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
-import com.finki.courses.Repositories.AuthenticationRepository;
+import com.finki.courses.Repositories.Implementations.AuthenticationRepository;
 import com.finki.courses.databinding.FragmentUserBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

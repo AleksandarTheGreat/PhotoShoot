@@ -2,7 +2,6 @@ package com.finki.courses.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.core.graphics.Insets;
@@ -10,9 +9,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.finki.courses.R;
-import com.finki.courses.Repositories.AuthenticationRepository;
+import com.finki.courses.Repositories.Implementations.AuthenticationRepository;
 import com.finki.courses.databinding.ActivityLoginBinding;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends ParentActivity {
 

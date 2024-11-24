@@ -1,4 +1,4 @@
-package com.finki.courses.Repositories;
+package com.finki.courses.Repositories.Implementations;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import com.finki.courses.Activities.LoginActivity;
 import com.finki.courses.Activities.MainActivity;
 import com.finki.courses.Helper.Implementations.Toaster;
+import com.finki.courses.Model.User;
+import com.finki.courses.Repositories.IAuthenticationRepository;
 import com.finki.courses.databinding.ActivityLoginBinding;
 import com.finki.courses.databinding.ActivitySignupBinding;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -17,15 +19,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
-import com.google.firestore.v1.Document;
 
 import java.util.HashMap;
-import java.util.regex.Pattern;
+import java.util.Map;
 
-public class AuthenticationRepository implements IAuthenticationRepository{
+public class AuthenticationRepository implements IAuthenticationRepository {
 
     private Context context;
     private FirebaseAuth firebaseAuth;
@@ -67,12 +66,23 @@ public class AuthenticationRepository implements IAuthenticationRepository{
 
                         // Here I also create a document for that user
                         FirebaseUser firebaseUser = authResult.getUser();
+                        String email = firebaseUser.getEmail();
+
+                        User user = new User(email);
+
+                        Map<String, Object> userMap = new HashMap<>();
+                        userMap.put("user", user);
+
                         String documentName = firebaseUser.getEmail().toString();
                         firebaseFirestore.collection("Users").document(documentName)
-                                .set(new HashMap<>())
+                                .set(userMap)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
+                                        Intent intentGoToMainActivity = new Intent(context, MainActivity.class);
+                                        intentGoToMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        context.startActivity(intentGoToMainActivity);
+
                                         Log.d("Tag", "Created document for user '" + firebaseUser.getEmail() + "' ");
                                     }
                                 })
@@ -82,10 +92,6 @@ public class AuthenticationRepository implements IAuthenticationRepository{
                                         Log.d("Tag", e.getLocalizedMessage());
                                     }
                                 });
-
-                        Intent intentGoToMainActivity = new Intent(context, MainActivity.class);
-                        intentGoToMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        context.startActivity(intentGoToMainActivity);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
