@@ -90,9 +90,6 @@ public class FragmentHomeHelper {
                         // Take the now saved category
 
                         categoryRepository.add(text);
-
-                        showScrollViewAndHideLinearLayout();
-                        createAWholeCategoryLayout(new Category(text, new ArrayList<>()));
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -107,7 +104,6 @@ public class FragmentHomeHelper {
     }
 
     public void createAWholeCategoryLayout(Category category) {
-        binding.linearLayoutCategories.removeAllViews();
         createAHeaderForCategory(category.getName());
 
         if (category.getPostList().isEmpty()) {
@@ -197,7 +193,7 @@ public class FragmentHomeHelper {
         linearLayout.setLayoutParams(layoutParamsLinearLayout);
 
 
-        LinearLayout.LayoutParams layoutParamsImageView = new LinearLayout.LayoutParams(300, 300);
+        LinearLayout.LayoutParams layoutParamsImageView = new LinearLayout.LayoutParams(250, 250);
         layoutParamsImageView.setMargins(0, 0, 0, 48);
 
         ImageView imageView = new ImageView(context);

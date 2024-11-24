@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class CategoryRepository implements ICategoriesRepository {
@@ -55,13 +56,22 @@ public class CategoryRepository implements ICategoriesRepository {
                         List<Map<String, Object>> listOfMaps = (List<Map<String, Object>>) map.get("categoryList");
 
                         List<Category> categoryList = new ArrayList<>();
-                        listOfMaps.forEach(new Consumer<Map<String, Object>>() {
+                        Objects.requireNonNull(listOfMaps).forEach(new Consumer<Map<String, Object>>() {
                             @Override
                             public void accept(Map<String, Object> stringObjectMap) {
-                                Category category = new Category((String) stringObjectMap.get("name"), (List<Post>) stringObjectMap.get("postList"));
+                                String name = (String) stringObjectMap.get("name");
+                                List<Post> postList = (List<Post>) stringObjectMap.get("postList");
+
+                                Category category = new Category(name, postList);
                                 categoryList.add(category);
                             }
                         });
+
+                        if (!categoryList.isEmpty()){
+                            fragmentHomeHelper.showScrollViewAndHideLinearLayout();
+                        } else {
+                            fragmentHomeHelper.hideScrollViewAndShowLinearLayout();
+                        }
 
                         for (Category category: categoryList){
                             fragmentHomeHelper.createAWholeCategoryLayout(category);
@@ -104,6 +114,9 @@ public class CategoryRepository implements ICategoriesRepository {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         toaster.text("Added new category");
+
+                                        fragmentHomeHelper.showScrollViewAndHideLinearLayout();
+                                        fragmentHomeHelper.createAWholeCategoryLayout(new Category(name, new ArrayList<>()));
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -124,20 +137,6 @@ public class CategoryRepository implements ICategoriesRepository {
 
     @Override
     public void delete(String name) {
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
-        documentReference.delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        toaster.text("Deleted document");
-                        Log.d("Tag", "Successfully deleted document");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("Tag", "Failed to delete document");
-                    }
-                });
+
     }
 }
