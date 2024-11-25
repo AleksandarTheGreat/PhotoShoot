@@ -60,10 +60,10 @@ public class CategoryRepository implements ICategoriesRepository {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
-                        List<Map<String, Object>> listOfMaps = (List<Map<String, Object>>) map.get("categoryList");
+                        List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
                         List<Category> categoryList = new ArrayList<>();
-                        Objects.requireNonNull(listOfMaps).forEach(new Consumer<Map<String, Object>>() {
+                        Objects.requireNonNull(listOfCategories).forEach(new Consumer<Map<String, Object>>() {
                             @Override
                             public void accept(Map<String, Object> stringObjectMap) {
                                 String name = (String) stringObjectMap.get("name");
@@ -81,7 +81,7 @@ public class CategoryRepository implements ICategoriesRepository {
                         }
 
                         for (Category category: categoryList){
-                            fragmentHomeHelper.createAWholeCategoryLayout(category);
+                            fragmentHomeHelper.buildUILayoutForCategory(category);
                         }
 
                         Log.d("Tag", "All categories are : " + categoryList);
@@ -95,8 +95,34 @@ public class CategoryRepository implements ICategoriesRepository {
                 });
     }
 
+    // Not needed for now
+    // I will figure it out later
     @Override
     public Category findCategoryByName(String name) {
+        Category category;
+        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
+        documentReference.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
+                        List<Map<String, Object>> listOfCategoriesMap = (List<Map<String, Object>>) userMap.get("categoryList");
+
+                        for (Map<String, Object> map: listOfCategoriesMap){
+                            String title = map.get("name").toString();
+                            if (title.equalsIgnoreCase(name)){
+                                List<Post> postList = (List<Post>) map.get("postList");
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                       Log.d("Tag", e.getLocalizedMessage());
+                    }
+                });
+
         return null;
     }
 
@@ -123,7 +149,7 @@ public class CategoryRepository implements ICategoriesRepository {
                                         toaster.text("Added new category");
 
                                         fragmentHomeHelper.showScrollViewAndHideLinearLayout();
-                                        fragmentHomeHelper.createAWholeCategoryLayout(new Category(name, new ArrayList<>()));
+                                        fragmentHomeHelper.buildUILayoutForCategory(new Category(name, new ArrayList<>()));
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

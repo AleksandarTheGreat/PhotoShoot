@@ -8,16 +8,22 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
+import com.finki.courses.Model.Category;
+import com.finki.courses.Model.Post;
 import com.finki.courses.R;
+import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.FragmentAddPostBinding;
 import com.squareup.picasso.Picasso;
+
+import java.time.LocalDateTime;
 
 
 public class FragmentAddPost extends Fragment implements IEssentials {
@@ -26,9 +32,16 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     private Toaster toaster;
     private static final int REQ_CODE_GALLERY = 1;
     private Uri pickedImageUri;
+    private String categoryName;
+    private PostRepository postRepository;
 
     public FragmentAddPost() {
         // Required empty public constructor
+    }
+
+    public FragmentAddPost(String categoryName){
+        this.categoryName = categoryName;
+        Log.d("Tag", "Category is '" + categoryName + "'");
     }
 
     @Override
@@ -45,6 +58,8 @@ public class FragmentAddPost extends Fragment implements IEssentials {
 
     @Override
     public void instantiateObjects() {
+        postRepository = new PostRepository(getContext());
+
         toaster = new Toaster(getContext());
     }
 
@@ -61,6 +76,10 @@ public class FragmentAddPost extends Fragment implements IEssentials {
             binding.imageViewAdd.setVisibility(View.VISIBLE);
             binding.imageViewPickedImage.setImageResource(0);
             pickedImageUri = null;
+
+            // First save the image to firebase storage
+            // then after it is saved call postRepository.add(category, post);
+            postRepository.add(categoryName, new Post());
         });
     }
 

@@ -29,6 +29,7 @@ import com.finki.courses.Model.Post;
 import com.finki.courses.Model.User;
 import com.finki.courses.R;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
+import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -85,9 +86,7 @@ public class FragmentHomeHelper {
                         String text = textInputEditTextCategory.getText().toString().trim();
                         if (text.isEmpty())
                             return;
-
-                        // Save the new category to firebase
-                        // Take the now saved category
+                        
 
                         categoryRepository.add(text);
                     }
@@ -103,16 +102,22 @@ public class FragmentHomeHelper {
                 .show();
     }
 
-    public void createAWholeCategoryLayout(Category category) {
-        createAHeaderForCategory(category.getName());
-        if (category.getPostList().isEmpty()) {
-            createEmptyLayout();
-        } else {
-            createPostsLayout(category.getPostList());
+    public void buildUILayoutForCategory(Category category) {
+        String categoryName = category.getName();
+        List<Post> postList = category.getPostList();
+
+        buildUIHeaderForCategory(categoryName);
+        // No posts
+        if (postList.isEmpty()) {
+            buildAnEmptyUILayoutForCategory(categoryName);
+        }
+        // Yes posts
+        else {
+            buildPostsUILayoutForCategory(postList);
         }
     }
 
-    private void createAHeaderForCategory(String title) {
+    private void buildUIHeaderForCategory(String title) {
         LinearLayout.LayoutParams layoutParamsLinearHeader = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearHeader.setMargins(48, 0, 48, 42);
 
@@ -140,11 +145,10 @@ public class FragmentHomeHelper {
 
         ImageView imageViewIconViewAll = new ImageView(context);
         imageViewIconViewAll.setId(View.generateViewId());
-        imageViewIconViewAll.setImageResource(R.drawable.ic_test);
         imageViewIconViewAll.setLayoutParams(layoutParamsImageIcon1);
         imageViewIconViewAll.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentGallery());
             mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemGallery);
+            mainActivityHelper.changeFragments(new FragmentGallery(), true);
         });
 
 
@@ -156,10 +160,9 @@ public class FragmentHomeHelper {
 
         ImageView imageViewIconAddPost = new ImageView(context);
         imageViewIconAddPost.setId(View.generateViewId());
-        imageViewIconAddPost.setImageResource(R.drawable.ic_test);
         imageViewIconAddPost.setLayoutParams(layoutParamsImageIcon2);
         imageViewIconAddPost.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentAddPost());
+            mainActivityHelper.changeFragments(new FragmentAddPost(title), true);
         });
 
 
@@ -171,12 +174,37 @@ public class FragmentHomeHelper {
 
         ImageView imageViewIconDelete = new ImageView(context);
         imageViewIconDelete.setId(View.generateViewId());
-        imageViewIconDelete.setImageResource(R.drawable.ic_test);
         imageViewIconDelete.setLayoutParams(layoutParamsImageIcon3);
         imageViewIconDelete.setOnClickListener(view -> {
-            categoryRepository.delete(title);
+            new MaterialAlertDialogBuilder(context)
+                    .setTitle("Alert")
+                    .setMessage("Are you sure you want to delete '" + title + "' category")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            categoryRepository.delete(title);
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .setCancelable(true)
+                    .show();
         });
 
+
+        if (ThemeUtils.isNightModeOn(context)) {
+            imageViewIconViewAll.setImageResource(R.drawable.ic_list_night);
+            imageViewIconAddPost.setImageResource(R.drawable.ic_add_night);
+            imageViewIconDelete.setImageResource(R.drawable.ic_delete_night);
+        } else {
+            imageViewIconViewAll.setImageResource(R.drawable.ic_list_day);
+            imageViewIconAddPost.setImageResource(R.drawable.ic_add_day);
+            imageViewIconDelete.setImageResource(R.drawable.ic_delete_day);
+        }
 
         relativeLayoutHeader.addView(imageViewIconViewAll);
         relativeLayoutHeader.addView(imageViewIconAddPost);
@@ -185,7 +213,8 @@ public class FragmentHomeHelper {
 
         binding.linearLayoutCategories.addView(relativeLayoutHeader);
     }
-    private void createEmptyLayout() {
+
+    private void buildAnEmptyUILayoutForCategory(String categoryName) {
         LinearLayout.LayoutParams layoutParamsLinearLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearLayout.setMargins(48, 0, 48, 64);
 
@@ -218,7 +247,7 @@ public class FragmentHomeHelper {
         Button button = new Button(context);
         button.setText("Create a post");
         button.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentAddPost());
+            mainActivityHelper.changeFragments(new FragmentAddPost(categoryName), true);
         });
         button.setLayoutParams(layoutParamsButton);
 
@@ -229,7 +258,8 @@ public class FragmentHomeHelper {
 
         binding.linearLayoutCategories.addView(linearLayout);
     }
-    private void createPostsLayout(List<Post> postList) {
+
+    private void buildPostsUILayoutForCategory(List<Post> postList) {
         LinearLayout.LayoutParams layoutParamsHorizontalScrollView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
         layoutParamsHorizontalScrollView.setMargins(48, 0, 48, 64);
 

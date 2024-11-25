@@ -13,10 +13,16 @@ public class Post {
     private LocalDateTime postedAt;
     private String imageUrl;
 
-    public Post(){}
-    public Post(String name, LocalDateTime postedAt, String imageUrl) {
+    @SuppressLint("NewApi")
+    public Post(){
+        this.name = "";
+        this.postedAt = LocalDateTime.now();
+        this.imageUrl = "";
+    }
+    @SuppressLint("NewApi")
+    public Post(String name, String imageUrl) {
         this.name = name;
-        this.postedAt = postedAt;
+        this.postedAt = LocalDateTime.now();
         this.imageUrl = imageUrl;
     }
 

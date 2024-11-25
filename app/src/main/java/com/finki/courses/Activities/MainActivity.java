@@ -74,7 +74,7 @@ public class MainActivity extends ParentActivity {
 
         toaster = new Toaster(MainActivity.this);
 
-        mainActivityHelper.changeFragments(fragmentHome);
+        mainActivityHelper.changeFragments(fragmentHome, false);
         binding.bottomNavigationView.setSelectedItemId(R.id.itemHome);
     }
 
@@ -88,11 +88,11 @@ public class MainActivity extends ParentActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if (item.getItemId() == R.id.itemHome){
-                    mainActivityHelper.changeFragments(fragmentHome);
+                    mainActivityHelper.changeFragments(fragmentHome, false);
                 } else if (item.getItemId() == R.id.itemUser){
-                    mainActivityHelper.changeFragments(fragmentUser);
+                    mainActivityHelper.changeFragments(fragmentUser, false);
                 } else if (item.getItemId() == R.id.itemGallery){
-                    mainActivityHelper.changeFragments(fragmentGallery);
+                    mainActivityHelper.changeFragments(fragmentGallery, false);
                 }
                 return true;
             }

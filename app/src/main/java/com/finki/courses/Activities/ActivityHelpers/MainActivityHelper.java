@@ -30,9 +30,9 @@ public class MainActivityHelper {
         this.appCompatActivity = appCompatActivity;
     }
 
-    public void changeFragments(Fragment fragment){
+    public void changeFragments(Fragment fragment, boolean shouldPutOnStack) {
         FragmentManager fragmentManager = appCompatActivity.getSupportFragmentManager();
-        if (fragment instanceof FragmentAddPost){
+        if (shouldPutOnStack) {
             fragmentManager.beginTransaction()
                     .addToBackStack("stack1")
                     .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
@@ -45,7 +45,7 @@ public class MainActivityHelper {
         }
     }
 
-    public ActivityMainBinding getBinding(){
+    public ActivityMainBinding getBinding() {
         return binding;
     }
 
