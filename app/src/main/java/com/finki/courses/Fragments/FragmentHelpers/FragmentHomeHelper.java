@@ -65,7 +65,7 @@ public class FragmentHomeHelper {
         this.binding = binding;
         this.mainActivityHelper = mainActivityHelper;
 
-        this.categoryRepository = new CategoryRepository(context, this);
+        this.categoryRepository = new CategoryRepository(context, binding, this);
         this.toaster = toaster;
     }
 
@@ -105,7 +105,6 @@ public class FragmentHomeHelper {
 
     public void createAWholeCategoryLayout(Category category) {
         createAHeaderForCategory(category.getName());
-
         if (category.getPostList().isEmpty()) {
             createEmptyLayout();
         } else {
@@ -174,6 +173,9 @@ public class FragmentHomeHelper {
         imageViewIconDelete.setId(View.generateViewId());
         imageViewIconDelete.setImageResource(R.drawable.ic_test);
         imageViewIconDelete.setLayoutParams(layoutParamsImageIcon3);
+        imageViewIconDelete.setOnClickListener(view -> {
+            categoryRepository.delete(title);
+        });
 
 
         relativeLayoutHeader.addView(imageViewIconViewAll);

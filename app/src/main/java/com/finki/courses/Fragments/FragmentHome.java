@@ -58,10 +58,7 @@ public class FragmentHome extends Fragment implements IEssentials {
     public void instantiateObjects() {
         fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, mainActivityHelper, toaster);
 
-        // Remove all views in case there are some so I can load clean views
-        binding.linearLayoutCategories.removeAllViews();
-
-        categoryRepository = new CategoryRepository(getContext(), fragmentHomeHelper);
+        categoryRepository = new CategoryRepository(getContext(), binding, fragmentHomeHelper);
         categoryRepository.listAll();
 
         toaster = new Toaster(getContext());
