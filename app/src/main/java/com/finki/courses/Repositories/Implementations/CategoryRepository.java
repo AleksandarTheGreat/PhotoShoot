@@ -67,6 +67,7 @@ public class CategoryRepository implements ICategoriesRepository {
                             @Override
                             public void accept(Map<String, Object> stringObjectMap) {
                                 String name = (String) stringObjectMap.get("name");
+                                // These are actually a list of post-maps
                                 List<Post> postList = (List<Post>) stringObjectMap.get("postList");
 
                                 Category category = new Category(name, postList);

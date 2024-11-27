@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -42,6 +43,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
@@ -86,7 +88,6 @@ public class FragmentHomeHelper {
                         String text = textInputEditTextCategory.getText().toString().trim();
                         if (text.isEmpty())
                             return;
-                        
 
                         categoryRepository.add(text);
                     }
@@ -275,6 +276,11 @@ public class FragmentHomeHelper {
         linearLayout.setLayoutParams(layoutParamsLinearLayout);
 
         for (int i = 0; i < postList.size(); i++) {
+            // This represents a single post
+            // A post in firebase document is a map
+            // this is a map.
+            Map<String, Object> postMap = (Map<String, Object>) postList.get(i);
+
             LinearLayout.LayoutParams layoutParamsMaterialCardView = new LinearLayout.LayoutParams(350, ViewGroup.LayoutParams.MATCH_PARENT);
 
             if (i == 0) {
@@ -291,13 +297,20 @@ public class FragmentHomeHelper {
             materialCardView.setCheckable(true);
             materialCardView.setFocusable(true);
 
-            materialCardView.setOnCheckedChangeListener(new MaterialCardView.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(MaterialCardView card, boolean isChecked) {
-                    materialCardView.setChecked(isChecked);
-                }
-            });
 
+            LinearLayout.LayoutParams layoutParamsForImageView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            layoutParamsForImageView.setMargins(0,0,0,0);
+
+            ImageView imageViewPost = new ImageView(context);
+            if (postMap.get("imageUrl").equals(""))
+                imageViewPost.setImageResource(0);
+            else
+                Picasso.get().load(Uri.parse((String) postMap.get("imageUrl"))).into(imageViewPost);
+            imageViewPost.setLayoutParams(layoutParamsForImageView);
+            imageViewPost.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+
+            materialCardView.addView(imageViewPost);
             linearLayout.addView(materialCardView);
         }
 

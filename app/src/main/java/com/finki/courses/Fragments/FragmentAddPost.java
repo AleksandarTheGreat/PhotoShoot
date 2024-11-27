@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -21,8 +22,15 @@ import com.finki.courses.R;
 import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.FragmentAddPostBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 
 
@@ -31,15 +39,18 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     private FragmentAddPostBinding binding;
     private Toaster toaster;
     private static final int REQ_CODE_GALLERY = 1;
-    private Uri pickedImageUri;
+    private static Uri pickedImageUri;
     private String categoryName;
     private PostRepository postRepository;
+
+    private FirebaseStorage firebaseStorage;
+    private StorageReference storageReference;
 
     public FragmentAddPost() {
         // Required empty public constructor
     }
 
-    public FragmentAddPost(String categoryName){
+    public FragmentAddPost(String categoryName) {
         this.categoryName = categoryName;
         Log.d("Tag", "Category is '" + categoryName + "'");
     }
@@ -58,7 +69,10 @@ public class FragmentAddPost extends Fragment implements IEssentials {
 
     @Override
     public void instantiateObjects() {
-        postRepository = new PostRepository(getContext());
+        firebaseStorage = FirebaseStorage.getInstance();
+        storageReference = firebaseStorage.getReference();
+
+        postRepository = new PostRepository(getContext(), binding, storageReference);
 
         toaster = new Toaster(getContext());
     }
@@ -66,26 +80,33 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     @Override
     public void addEventListeners() {
         binding.imageViewAdd.setOnClickListener(view -> {
-            toaster.text("Okay, I've done this");
             Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
             openGalleryIntent.setType("image/*");
             startActivityForResult(openGalleryIntent, REQ_CODE_GALLERY);
         });
 
         binding.buttonSave.setOnClickListener(view -> {
-            binding.imageViewAdd.setVisibility(View.VISIBLE);
-            binding.imageViewPickedImage.setImageResource(0);
-            pickedImageUri = null;
+            if (pickedImageUri == null) {
+                toaster.text("Please pick an image first");
+                return;
+            }
 
-            // First save the image to firebase storage
-            // then after it is saved call postRepository.add(category, post);
-            postRepository.add(categoryName, new Post());
+            try {
+                InputStream inputStream = getContext().getContentResolver().openInputStream(pickedImageUri);
+                if (inputStream != null) {
+                    postRepository.uploadImage(categoryName, inputStream, System.currentTimeMillis() + ".jpg");
+                } else {
+                    toaster.text("Somehow the inputStream is null");
+                }
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
     @Override
     public void additionalThemeChanges() {
-        if (ThemeUtils.isNightModeOn(getContext())){
+        if (ThemeUtils.isNightModeOn(getContext())) {
             binding.imageViewAdd.setImageResource(R.drawable.ic_add_night);
         } else {
             binding.imageViewAdd.setImageResource(R.drawable.ic_add_day);
@@ -95,11 +116,21 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQ_CODE_GALLERY && resultCode == Activity.RESULT_OK && data != null){
+        if (requestCode == REQ_CODE_GALLERY && resultCode == Activity.RESULT_OK && data != null) {
             binding.imageViewAdd.setVisibility(View.INVISIBLE);
 
             pickedImageUri = data.getData();
             Picasso.get().load(data.getData()).into(binding.imageViewPickedImage);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        clearImageUri();
+    }
+
+    public static void clearImageUri(){
+        pickedImageUri = null;
     }
 }
