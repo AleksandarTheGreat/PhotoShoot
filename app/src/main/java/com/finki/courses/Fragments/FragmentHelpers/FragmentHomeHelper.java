@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
 import com.finki.courses.Fragments.FragmentGallery;
+import com.finki.courses.Fragments.ImageSliderFragment;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
@@ -44,6 +45,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.ortiz.touchview.TouchImageView;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -64,13 +66,13 @@ public class FragmentHomeHelper {
     private CategoryRepository categoryRepository;
     private Toaster toaster;
 
-    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, MainActivityHelper mainActivityHelper, Toaster toaster) {
+    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, MainActivityHelper mainActivityHelper) {
         this.context = context;
         this.binding = binding;
         this.mainActivityHelper = mainActivityHelper;
 
         this.categoryRepository = new CategoryRepository(context, binding, this);
-        this.toaster = toaster;
+        this.toaster = new Toaster(context);
     }
 
     public void showCategoryInputDialog() {
@@ -299,27 +301,18 @@ public class FragmentHomeHelper {
             materialCardView.setCheckable(true);
             materialCardView.setFocusable(true);
             materialCardView.setOnClickListener(view -> {
-                View singleClickView = LayoutInflater.from(context)
-                        .inflate(R.layout.single_image_click_layout, null);
-
-                @SuppressLint({"MissingInflatedId", "LocalSuppress"})
-                ImageView imageView = singleClickView.findViewById(R.id.imageViewSingleClick);
-                Picasso.get().load(imageUri).into(imageView);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setView(singleClickView)
-                        .setCancelable(true)
-                        .show();
+                // Change to imageViewSliderFragment
+                mainActivityHelper.changeFragments(new ImageSliderFragment(postList), true);
             });
 
 
             LinearLayout.LayoutParams layoutParamsForImageView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            layoutParamsForImageView.setMargins(0,0,0,0);
+            layoutParamsForImageView.setMargins(0, 0, 0, 0);
 
             ImageView imageViewPost = new ImageView(context);
-            if (postMap.get("imageUrl").equals(""))
+            if (postMap.get("imageUrl").equals("")) {
                 imageViewPost.setImageResource(0);
-            else
+            } else
                 Picasso.get().load(imageUri).into(imageViewPost);
             imageViewPost.setLayoutParams(layoutParamsForImageView);
             imageViewPost.setScaleType(ImageView.ScaleType.CENTER_CROP);

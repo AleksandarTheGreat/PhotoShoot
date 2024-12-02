@@ -19,6 +19,7 @@ import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.R;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
+import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -34,6 +35,7 @@ public class FragmentHome extends Fragment implements IEssentials {
     private FragmentHomeHelper fragmentHomeHelper;
     private MainActivityHelper mainActivityHelper;
     private CategoryRepository categoryRepository;
+    private boolean isNightModeOn;
 
     public FragmentHome() {
         // Required empty public constructor
@@ -56,7 +58,8 @@ public class FragmentHome extends Fragment implements IEssentials {
 
     @Override
     public void instantiateObjects() {
-        fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, mainActivityHelper, toaster);
+        isNightModeOn = ThemeUtils.isNightModeOn(getContext());
+        fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, mainActivityHelper);
 
         categoryRepository = new CategoryRepository(getContext(), binding, fragmentHomeHelper);
         categoryRepository.listAll();
