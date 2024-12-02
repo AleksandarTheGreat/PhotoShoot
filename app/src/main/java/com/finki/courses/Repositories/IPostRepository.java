@@ -8,5 +8,5 @@ public interface IPostRepository {
     void add(String categoryName, Post post);
     void delete();
 
-    void uploadImage(String categoryName, InputStream inputStream, String filePath);
+    void uploadImage(String categoryName, InputStream inputStream);
 }

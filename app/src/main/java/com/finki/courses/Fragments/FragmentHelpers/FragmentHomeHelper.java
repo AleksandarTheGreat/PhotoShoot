@@ -1,6 +1,7 @@
 package com.finki.courses.Fragments.FragmentHelpers;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -280,6 +281,7 @@ public class FragmentHomeHelper {
             // A post in firebase document is a map
             // this is a map.
             Map<String, Object> postMap = (Map<String, Object>) postList.get(i);
+            Uri imageUri = Uri.parse((String) postMap.get("imageUrl"));
 
             LinearLayout.LayoutParams layoutParamsMaterialCardView = new LinearLayout.LayoutParams(350, ViewGroup.LayoutParams.MATCH_PARENT);
 
@@ -296,6 +298,19 @@ public class FragmentHomeHelper {
             materialCardView.setClickable(true);
             materialCardView.setCheckable(true);
             materialCardView.setFocusable(true);
+            materialCardView.setOnClickListener(view -> {
+                View singleClickView = LayoutInflater.from(context)
+                        .inflate(R.layout.single_image_click_layout, null);
+
+                @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+                ImageView imageView = singleClickView.findViewById(R.id.imageViewSingleClick);
+                Picasso.get().load(imageUri).into(imageView);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setView(singleClickView)
+                        .setCancelable(true)
+                        .show();
+            });
 
 
             LinearLayout.LayoutParams layoutParamsForImageView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -305,7 +320,7 @@ public class FragmentHomeHelper {
             if (postMap.get("imageUrl").equals(""))
                 imageViewPost.setImageResource(0);
             else
-                Picasso.get().load(Uri.parse((String) postMap.get("imageUrl"))).into(imageViewPost);
+                Picasso.get().load(imageUri).into(imageViewPost);
             imageViewPost.setLayoutParams(layoutParamsForImageView);
             imageViewPost.setScaleType(ImageView.ScaleType.CENTER_CROP);
 

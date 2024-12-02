@@ -94,7 +94,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
             try {
                 InputStream inputStream = getContext().getContentResolver().openInputStream(pickedImageUri);
                 if (inputStream != null) {
-                    postRepository.uploadImage(categoryName, inputStream, System.currentTimeMillis() + ".jpg");
+                    postRepository.uploadImage(categoryName, inputStream);
                 } else {
                     toaster.text("Somehow the inputStream is null");
                 }

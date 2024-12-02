@@ -1,5 +1,6 @@
 package com.finki.courses.Repositories.Implementations;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -35,6 +36,7 @@ public class PostRepository implements IPostRepository {
     private final FirebaseAuth firebaseAuth;
     private final FirebaseFirestore firebaseFirestore;
     private final FragmentAddPostBinding fragmentAddPostBinding;
+    private final ProgressDialog progressDialog;
 
     public PostRepository(Context context, FragmentAddPostBinding fragmentAddPostBinding, StorageReference storageReference) {
         this.context = context;
@@ -46,6 +48,7 @@ public class PostRepository implements IPostRepository {
         this.email = firebaseAuth.getCurrentUser().getEmail();
 
         this.toaster = new Toaster(context);
+        this.progressDialog = new ProgressDialog(context);
     }
 
     @Override
@@ -80,15 +83,20 @@ public class PostRepository implements IPostRepository {
                                             fragmentAddPostBinding.imageViewAdd.setVisibility(View.VISIBLE);
                                             fragmentAddPostBinding.imageViewPickedImage.setImageResource(0);
                                             FragmentAddPost.clearImageUri();
+                                            progressDialog.dismiss();
+
+                                            // redirect:/home fragment
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.d("Tag", e.getLocalizedMessage());
+                                            toaster.text(e.getLocalizedMessage());
                                             fragmentAddPostBinding.imageViewAdd.setVisibility(View.VISIBLE);
                                             fragmentAddPostBinding.imageViewPickedImage.setImageResource(0);
                                             FragmentAddPost.clearImageUri();
+                                            progressDialog.dismiss();
                                         }
                                     });
                         } else {
@@ -100,6 +108,8 @@ public class PostRepository implements IPostRepository {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d("Tag", e.getLocalizedMessage());
+                        toaster.text(e.getLocalizedMessage());
+                        progressDialog.dismiss();
                     }
                 });
     }
@@ -110,8 +120,18 @@ public class PostRepository implements IPostRepository {
     }
 
     @Override
-    public void uploadImage(String categoryName, InputStream inputStream, String filePath) {
-        StorageReference imageRef = storageReference.child(filePath);
+    public void uploadImage(String categoryName, InputStream inputStream) {
+        // File location for the image should be
+        // /email/category/imageName.jpg
+
+        String email = firebaseAuth.getCurrentUser().getEmail();
+        String fileName = "/" + email + "/" + categoryName + "/" + System.currentTimeMillis() + ".jpg";
+
+        progressDialog.setTitle("Uploading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        StorageReference imageRef = storageReference.child(fileName);
 
         UploadTask uploadTask = (UploadTask) imageRef.putStream(inputStream)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -122,7 +142,7 @@ public class PostRepository implements IPostRepository {
                                     public void onSuccess(Uri uri) {
                                         String imageUriToString = String.valueOf(uri);
 
-                                        Post post = new Post(filePath, imageUriToString);
+                                        Post post = new Post(fileName, imageUriToString);
                                         add(categoryName, post);
                                     }
                                 })
@@ -131,6 +151,7 @@ public class PostRepository implements IPostRepository {
                                     public void onFailure(@NonNull Exception e) {
                                         toaster.text(e.getMessage());
                                         Log.d("Tag", e.getLocalizedMessage());
+                                        progressDialog.dismiss();
                                     }
                                 });
                     }
@@ -140,6 +161,7 @@ public class PostRepository implements IPostRepository {
                     public void onFailure(@NonNull Exception e) {
                         toaster.text(e.getMessage());
                         Log.d("Tag", e.getLocalizedMessage());
+                        progressDialog.dismiss();
                     }
                 });
     }

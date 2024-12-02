@@ -38,21 +38,25 @@ public class CategoryRepository implements ICategoriesRepository {
     private final String email;
 
     private final Toaster toaster;
+    private List<Category> categoryList;
 
     public CategoryRepository(Context context, FragmentHomeBinding binding, FragmentHomeHelper fragmentHomeHelper){
         this.context = context;
         this.binding = binding;
         this.fragmentHomeHelper = fragmentHomeHelper;
-        this.toaster = new Toaster(context);
 
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.firebaseFirestore = FirebaseFirestore.getInstance();
         this.email = firebaseAuth.getCurrentUser().getEmail();
+
+        this.categoryList = new ArrayList<>();
+        this.toaster = new Toaster(context);
     }
 
     @Override
     public void listAll() {
         binding.linearLayoutCategories.removeAllViews();
+        categoryList = new ArrayList<>();
 
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
         documentReference.get()
@@ -62,7 +66,6 @@ public class CategoryRepository implements ICategoriesRepository {
                         Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
                         List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
-                        List<Category> categoryList = new ArrayList<>();
                         Objects.requireNonNull(listOfCategories).forEach(new Consumer<Map<String, Object>>() {
                             @Override
                             public void accept(Map<String, Object> stringObjectMap) {
@@ -85,6 +88,7 @@ public class CategoryRepository implements ICategoriesRepository {
                             fragmentHomeHelper.buildUILayoutForCategory(category);
                         }
 
+                        toaster.text("Loaded all from firebase");
                         Log.d("Tag", "All categories are : " + categoryList);
                     }
                 })
@@ -213,5 +217,13 @@ public class CategoryRepository implements ICategoriesRepository {
                         Log.d("Tag", e.getLocalizedMessage());
                     }
                 });
+    }
+
+    public List<Category> getCategoryList() {
+        return categoryList;
+    }
+
+    public void setCategoryList(List<Category> categoryList) {
+        this.categoryList = categoryList;
     }
 }
