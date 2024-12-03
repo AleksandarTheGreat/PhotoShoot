@@ -23,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,8 +71,7 @@ public class CategoryRepository implements ICategoriesRepository {
                             @Override
                             public void accept(Map<String, Object> stringObjectMap) {
                                 String name = (String) stringObjectMap.get("name");
-                                // These are actually a list of post-maps
-                                List<Post> postList = (List<Post>) stringObjectMap.get("postList");
+                                List<Map<String, Object>> postList = (List<Map<String, Object>>) stringObjectMap.get("postList");
 
                                 Category category = new Category(name, postList);
                                 categoryList.add(category);
@@ -140,12 +140,19 @@ public class CategoryRepository implements ICategoriesRepository {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
-                        List<Category> categoryList = (List<Category>) map.get("categoryList");
+                        List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
-                        Category category = new Category(name);
-                        categoryList.add(category);
+//                        List<Category> categoryList = (List<Category>) map.get("categoryList");
+//                        Category category = new Category(name);
+//                        categoryList.add(category);
 
-                        map.put("categoryList", categoryList);
+                        Map<String, Object> categoryMap = new HashMap<>();
+                        categoryMap.put("name", name);
+                        categoryMap.put("postList", new ArrayList<>());
+
+                        listOfCategories.add(categoryMap);
+
+                        map.put("categoryList", listOfCategories);
 
                         documentReference.update("user", map)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {

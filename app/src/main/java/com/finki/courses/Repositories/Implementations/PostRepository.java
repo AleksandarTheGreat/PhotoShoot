@@ -9,7 +9,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
+import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Post;
 import com.finki.courses.Repositories.IPostRepository;
@@ -36,10 +38,13 @@ public class PostRepository implements IPostRepository {
     private final FirebaseAuth firebaseAuth;
     private final FirebaseFirestore firebaseFirestore;
     private final FragmentAddPostBinding fragmentAddPostBinding;
+    private final MainActivityHelper mainActivityHelper;
     private final ProgressDialog progressDialog;
 
-    public PostRepository(Context context, FragmentAddPostBinding fragmentAddPostBinding, StorageReference storageReference) {
+    public PostRepository(Context context, FragmentAddPostBinding fragmentAddPostBinding,
+                          MainActivityHelper mainActivityHelper, StorageReference storageReference) {
         this.context = context;
+        this.mainActivityHelper = mainActivityHelper;
         this.fragmentAddPostBinding = fragmentAddPostBinding;
         this.storageReference = storageReference;
 
@@ -85,6 +90,7 @@ public class PostRepository implements IPostRepository {
                                             FragmentAddPost.clearImageUri();
                                             progressDialog.dismiss();
 
+                                            mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
                                             // redirect:/home fragment
                                         }
                                     })
@@ -101,6 +107,7 @@ public class PostRepository implements IPostRepository {
                                     });
                         } else {
                             toaster.text("Category not found");
+                            progressDialog.dismiss();
                         }
                     }
                 })
@@ -109,6 +116,9 @@ public class PostRepository implements IPostRepository {
                     public void onFailure(@NonNull Exception e) {
                         Log.d("Tag", e.getLocalizedMessage());
                         toaster.text(e.getLocalizedMessage());
+                        fragmentAddPostBinding.imageViewAdd.setVisibility(View.VISIBLE);
+                        fragmentAddPostBinding.imageViewPickedImage.setImageResource(0);
+                        FragmentAddPost.clearImageUri();
                         progressDialog.dismiss();
                     }
                 });

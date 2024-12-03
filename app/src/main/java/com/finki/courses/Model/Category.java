@@ -4,11 +4,12 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Category {
 
     private String name;
-    private List<Post> postList;
+    private List<Map<String, Object>> postList;
 
     public Category(){};
     public Category(String name){
@@ -16,7 +17,7 @@ public class Category {
         this.postList = new ArrayList<>();
     }
 
-    public Category(String name, List<Post> postList){
+    public Category(String name, List<Map<String, Object>> postList){
         this.name = name;
         this.postList = postList;
     }
@@ -35,11 +36,11 @@ public class Category {
         this.name = name;
     }
 
-    public List<Post> getPostList() {
+    public List<Map<String, Object>> getPostList() {
         return postList;
     }
 
-    public void setPostList(List<Post> postList) {
+    public void setPostList(List<Map<String, Object>> postList) {
         this.postList = postList;
     }
 }

@@ -108,7 +108,7 @@ public class FragmentHomeHelper {
 
     public void buildUILayoutForCategory(Category category) {
         String categoryName = category.getName();
-        List<Post> postList = category.getPostList();
+        List<Map<String, Object>> postList = category.getPostList();
 
         buildUIHeaderForCategory(categoryName);
         // No posts
@@ -166,7 +166,7 @@ public class FragmentHomeHelper {
         imageViewIconAddPost.setId(View.generateViewId());
         imageViewIconAddPost.setLayoutParams(layoutParamsImageIcon2);
         imageViewIconAddPost.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentAddPost(title), true);
+            mainActivityHelper.changeFragments(new FragmentAddPost(title, mainActivityHelper), true);
         });
 
 
@@ -251,7 +251,7 @@ public class FragmentHomeHelper {
         Button button = new Button(context);
         button.setText("Create a post");
         button.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentAddPost(categoryName), true);
+            mainActivityHelper.changeFragments(new FragmentAddPost(categoryName, mainActivityHelper), true);
         });
         button.setLayoutParams(layoutParamsButton);
 
@@ -263,7 +263,7 @@ public class FragmentHomeHelper {
         binding.linearLayoutCategories.addView(linearLayout);
     }
 
-    private void buildPostsUILayoutForCategory(List<Post> postList) {
+    private void buildPostsUILayoutForCategory(List<Map<String, Object>> postList) {
         LinearLayout.LayoutParams layoutParamsHorizontalScrollView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
         layoutParamsHorizontalScrollView.setMargins(48, 0, 48, 64);
 
@@ -300,9 +300,10 @@ public class FragmentHomeHelper {
             materialCardView.setClickable(true);
             materialCardView.setCheckable(true);
             materialCardView.setFocusable(true);
+            int finalI = i;
             materialCardView.setOnClickListener(view -> {
                 // Change to imageViewSliderFragment
-                mainActivityHelper.changeFragments(new ImageSliderFragment(postList), true);
+                mainActivityHelper.changeFragments(new ImageSliderFragment(mainActivityHelper, postList, finalI), true);
             });
 
 

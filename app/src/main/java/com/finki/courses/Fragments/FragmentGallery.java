@@ -42,6 +42,7 @@ public class FragmentGallery extends Fragment implements IEssentials {
 
     @Override
     public void addEventListeners() {
+
     }
 
     @Override

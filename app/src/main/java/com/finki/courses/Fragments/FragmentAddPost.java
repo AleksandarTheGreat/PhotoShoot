@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
@@ -42,6 +43,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     private static Uri pickedImageUri;
     private String categoryName;
     private PostRepository postRepository;
+    private MainActivityHelper mainActivityHelper;
 
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
@@ -50,9 +52,9 @@ public class FragmentAddPost extends Fragment implements IEssentials {
         // Required empty public constructor
     }
 
-    public FragmentAddPost(String categoryName) {
+    public FragmentAddPost(String categoryName, MainActivityHelper mainActivityHelper) {
         this.categoryName = categoryName;
-        Log.d("Tag", "Category is '" + categoryName + "'");
+        this.mainActivityHelper = mainActivityHelper;
     }
 
     @Override
@@ -72,7 +74,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
 
-        postRepository = new PostRepository(getContext(), binding, storageReference);
+        postRepository = new PostRepository(getContext(), binding, mainActivityHelper, storageReference);
 
         toaster = new Toaster(getContext());
     }
