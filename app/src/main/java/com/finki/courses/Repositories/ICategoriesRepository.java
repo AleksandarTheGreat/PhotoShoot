@@ -7,7 +7,7 @@ import java.util.List;
 public interface ICategoriesRepository {
 
     void listAll();
-    Category findCategoryByName(String name);
+    Category findCategoryById(long id);
     void add(String name);
-    void delete(String name);
+    void deleteById(long id);
 }

@@ -41,7 +41,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     private Toaster toaster;
     private static final int REQ_CODE_GALLERY = 1;
     private static Uri pickedImageUri;
-    private String categoryName;
+    private Category category;
     private PostRepository postRepository;
     private MainActivityHelper mainActivityHelper;
 
@@ -52,8 +52,8 @@ public class FragmentAddPost extends Fragment implements IEssentials {
         // Required empty public constructor
     }
 
-    public FragmentAddPost(String categoryName, MainActivityHelper mainActivityHelper) {
-        this.categoryName = categoryName;
+    public FragmentAddPost(Category category, MainActivityHelper mainActivityHelper) {
+        this.category = category;
         this.mainActivityHelper = mainActivityHelper;
     }
 
@@ -96,7 +96,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
             try {
                 InputStream inputStream = getContext().getContentResolver().openInputStream(pickedImageUri);
                 if (inputStream != null) {
-                    postRepository.uploadImage(categoryName, inputStream);
+                    postRepository.uploadImage(category, inputStream);
                 } else {
                     toaster.text("Somehow the inputStream is null");
                 }

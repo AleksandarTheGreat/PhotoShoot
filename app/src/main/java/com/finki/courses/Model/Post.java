@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Post {
 
+    private long id;
     private String name;
     private LocalDateTime postedAt;
     private String imageUrl;
@@ -20,7 +21,8 @@ public class Post {
         this.imageUrl = "";
     }
     @SuppressLint("NewApi")
-    public Post(String name, String imageUrl) {
+    public Post(long id, String name, String imageUrl) {
+        this.id = id;
         this.name = name;
         this.postedAt = LocalDateTime.now();
         this.imageUrl = imageUrl;
@@ -35,6 +37,10 @@ public class Post {
     @SuppressLint("NewApi")
     public String nicelyFormattedDateTime(){
         return DateTimeFormatter.ofPattern("dd.MM.yyyy 'at' hh:mm").format(postedAt);
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {

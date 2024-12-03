@@ -13,6 +13,7 @@ import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
 import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Helper.Implementations.Toaster;
+import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
 import com.finki.courses.Repositories.IPostRepository;
 import com.finki.courses.databinding.FragmentAddPostBinding;
@@ -28,6 +29,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class PostRepository implements IPostRepository {
 
@@ -57,21 +59,24 @@ public class PostRepository implements IPostRepository {
     }
 
     @Override
-    public void add(String categoryName, Post post) {
+    public void add(long categoryId, Post post) {
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        // If I can add a post, the document must exist first
+                        // there fore this cannot be null nor empty ?
+
                         Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
                         List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
                         boolean check = false;
                         for (Map<String, Object> map1: listOfCategories){
-                            String name = (String) map1.get("name");
+                            long cid = Long.parseLong(String.valueOf(map1.get("id")));
                             List<Post> postList = (List<Post>) map1.get("postList");
 
-                            if (name.equalsIgnoreCase(categoryName)){
+                            if (cid == categoryId){
                                 postList.add(post);
                                 check = true;
                                 break;
@@ -125,16 +130,18 @@ public class PostRepository implements IPostRepository {
     }
 
     @Override
-    public void delete() {
+    public void deleteById(long categoryId, long postId) {
 
     }
 
+
     @Override
-    public void uploadImage(String categoryName, InputStream inputStream) {
+    public void uploadImage(Category category, InputStream inputStream) {
         // File location for the image should be
         // /email/category/imageName.jpg
 
         String email = firebaseAuth.getCurrentUser().getEmail();
+        String categoryName = category.getName();
         String fileName = "/" + email + "/" + categoryName + "/" + System.currentTimeMillis() + ".jpg";
 
         progressDialog.setTitle("Uploading...");
@@ -152,8 +159,9 @@ public class PostRepository implements IPostRepository {
                                     public void onSuccess(Uri uri) {
                                         String imageUriToString = String.valueOf(uri);
 
-                                        Post post = new Post(fileName, imageUriToString);
-                                        add(categoryName, post);
+                                        long postId = UUID.randomUUID().getLeastSignificantBits() * -1;
+                                        Post post = new Post(postId, fileName, imageUriToString);
+                                        add(category.getId(), post);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

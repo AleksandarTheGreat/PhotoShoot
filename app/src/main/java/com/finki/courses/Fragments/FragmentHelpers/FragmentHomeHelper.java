@@ -107,13 +107,12 @@ public class FragmentHomeHelper {
     }
 
     public void buildUILayoutForCategory(Category category) {
-        String categoryName = category.getName();
         List<Map<String, Object>> postList = category.getPostList();
 
-        buildUIHeaderForCategory(categoryName);
+        buildUIHeaderForCategory(category);
         // No posts
         if (postList.isEmpty()) {
-            buildAnEmptyUILayoutForCategory(categoryName);
+            buildAnEmptyUILayoutForCategory(category);
         }
         // Yes posts
         else {
@@ -121,7 +120,7 @@ public class FragmentHomeHelper {
         }
     }
 
-    private void buildUIHeaderForCategory(String title) {
+    private void buildUIHeaderForCategory(Category category) {
         LinearLayout.LayoutParams layoutParamsLinearHeader = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearHeader.setMargins(48, 0, 48, 42);
 
@@ -137,7 +136,7 @@ public class FragmentHomeHelper {
         TextView textViewCategoryTitle = new TextView(context);
         textViewCategoryTitle.setTextSize(18);
         textViewCategoryTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        textViewCategoryTitle.setText(title);
+        textViewCategoryTitle.setText(category.getName());
         textViewCategoryTitle.setLayoutParams(layoutParamsTextView);
 
 
@@ -166,7 +165,7 @@ public class FragmentHomeHelper {
         imageViewIconAddPost.setId(View.generateViewId());
         imageViewIconAddPost.setLayoutParams(layoutParamsImageIcon2);
         imageViewIconAddPost.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentAddPost(title, mainActivityHelper), true);
+            mainActivityHelper.changeFragments(new FragmentAddPost(category, mainActivityHelper), true);
         });
 
 
@@ -182,11 +181,11 @@ public class FragmentHomeHelper {
         imageViewIconDelete.setOnClickListener(view -> {
             new MaterialAlertDialogBuilder(context)
                     .setTitle("Alert")
-                    .setMessage("Are you sure you want to delete '" + title + "' category")
+                    .setMessage("Are you sure you want to delete '" + category.getName() + "' category")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            categoryRepository.delete(title);
+                            categoryRepository.deleteById(category.getId());
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -218,7 +217,7 @@ public class FragmentHomeHelper {
         binding.linearLayoutCategories.addView(relativeLayoutHeader);
     }
 
-    private void buildAnEmptyUILayoutForCategory(String categoryName) {
+    private void buildAnEmptyUILayoutForCategory(Category category) {
         LinearLayout.LayoutParams layoutParamsLinearLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearLayout.setMargins(48, 0, 48, 64);
 
@@ -251,7 +250,7 @@ public class FragmentHomeHelper {
         Button button = new Button(context);
         button.setText("Create a post");
         button.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentAddPost(categoryName, mainActivityHelper), true);
+            mainActivityHelper.changeFragments(new FragmentAddPost(category, mainActivityHelper), true);
         });
         button.setLayoutParams(layoutParamsButton);
 

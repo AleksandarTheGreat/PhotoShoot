@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class Category {
 
+    private long id;
     private String name;
     private List<Map<String, Object>> postList;
 
@@ -18,6 +19,12 @@ public class Category {
     }
 
     public Category(String name, List<Map<String, Object>> postList){
+        this.name = name;
+        this.postList = postList;
+    }
+
+    public Category(long id, String name, List<Map<String, Object>> postList) {
+        this.id = id;
         this.name = name;
         this.postList = postList;
     }
@@ -34,6 +41,10 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public List<Map<String, Object>> getPostList() {

@@ -14,12 +14,15 @@ import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
 import com.finki.courses.Repositories.ICategoriesRepository;
 import com.finki.courses.databinding.FragmentHomeBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firestore.v1.Document;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class CategoryRepository implements ICategoriesRepository {
@@ -41,7 +45,7 @@ public class CategoryRepository implements ICategoriesRepository {
     private final Toaster toaster;
     private List<Category> categoryList;
 
-    public CategoryRepository(Context context, FragmentHomeBinding binding, FragmentHomeHelper fragmentHomeHelper){
+    public CategoryRepository(Context context, FragmentHomeBinding binding, FragmentHomeHelper fragmentHomeHelper) {
         this.context = context;
         this.binding = binding;
         this.fragmentHomeHelper = fragmentHomeHelper;
@@ -60,42 +64,51 @@ public class CategoryRepository implements ICategoriesRepository {
         categoryList = new ArrayList<>();
 
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
-        documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
-                        List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if (documentSnapshot.exists()) {
+                                Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
+                                List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
-                        Objects.requireNonNull(listOfCategories).forEach(new Consumer<Map<String, Object>>() {
-                            @Override
-                            public void accept(Map<String, Object> stringObjectMap) {
-                                String name = (String) stringObjectMap.get("name");
-                                List<Map<String, Object>> postList = (List<Map<String, Object>>) stringObjectMap.get("postList");
+                                Objects.requireNonNull(listOfCategories).forEach(new Consumer<Map<String, Object>>() {
+                                    @Override
+                                    public void accept(Map<String, Object> stringObjectMap) {
+                                        long id = Long.parseLong(String.valueOf(stringObjectMap.get("id")));
+                                        String name = (String) stringObjectMap.get("name");
+                                        List<Map<String, Object>> postList = (List<Map<String, Object>>) stringObjectMap.get("postList");
 
-                                Category category = new Category(name, postList);
-                                categoryList.add(category);
+                                        Category category = new Category(id, name, postList);
+                                        categoryList.add(category);
+                                    }
+                                });
+
+                                if (!categoryList.isEmpty()) {
+                                    fragmentHomeHelper.showScrollViewAndHideLinearLayout();
+                                } else {
+                                    fragmentHomeHelper.hideScrollViewAndShowLinearLayout();
+                                }
+
+                                for (Category category : categoryList) {
+                                    fragmentHomeHelper.buildUILayoutForCategory(category);
+                                }
+
+                                toaster.text("Loaded all from firebase");
+                                Log.d("Tag", "All categories are : " + categoryList);
+                            } else {
+                                toaster.text("Document doesn't exist, yet");
                             }
-                        });
-
-                        if (!categoryList.isEmpty()){
-                            fragmentHomeHelper.showScrollViewAndHideLinearLayout();
                         } else {
-                            fragmentHomeHelper.hideScrollViewAndShowLinearLayout();
+                            toaster.text("Task failed");
                         }
-
-                        for (Category category: categoryList){
-                            fragmentHomeHelper.buildUILayoutForCategory(category);
-                        }
-
-                        toaster.text("Loaded all from firebase");
-                        Log.d("Tag", "All categories are : " + categoryList);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d("Tag", e.getLocalizedMessage());
+                        toaster.text("Failed to retrieve the document");
                     }
                 });
     }
@@ -103,7 +116,7 @@ public class CategoryRepository implements ICategoriesRepository {
     // Not needed for now
     // I will figure it out later
     @Override
-    public Category findCategoryByName(String name) {
+    public Category findCategoryById(long id) {
         Category category;
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
         documentReference.get()
@@ -113,9 +126,9 @@ public class CategoryRepository implements ICategoriesRepository {
                         Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
                         List<Map<String, Object>> listOfCategoriesMap = (List<Map<String, Object>>) userMap.get("categoryList");
 
-                        for (Map<String, Object> map: listOfCategoriesMap){
-                            String title = map.get("name").toString();
-                            if (title.equalsIgnoreCase(name)){
+                        for (Map<String, Object> map : listOfCategoriesMap) {
+                            long cid = Long.parseLong(String.valueOf(map.get("id")));
+                            if (id == cid) {
                                 List<Post> postList = (List<Post>) map.get("postList");
                             }
                         }
@@ -124,7 +137,7 @@ public class CategoryRepository implements ICategoriesRepository {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                       Log.d("Tag", e.getLocalizedMessage());
+                        Log.d("Tag", e.getLocalizedMessage());
                     }
                 });
 
@@ -139,37 +152,67 @@ public class CategoryRepository implements ICategoriesRepository {
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
-                        List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
+                        if (documentSnapshot.exists()){
+                            Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
+                            List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
-//                        List<Category> categoryList = (List<Category>) map.get("categoryList");
-//                        Category category = new Category(name);
-//                        categoryList.add(category);
+                            long categoryID = UUID.randomUUID().getLeastSignificantBits() * -1;
+                            Map<String, Object> categoryMap = new HashMap<>();
+                            categoryMap.put("id", categoryID);
+                            categoryMap.put("name", name);
+                            categoryMap.put("postList", new ArrayList<>());
 
-                        Map<String, Object> categoryMap = new HashMap<>();
-                        categoryMap.put("name", name);
-                        categoryMap.put("postList", new ArrayList<>());
+                            listOfCategories.add(categoryMap);
+                            map.put("categoryList", listOfCategories);
+                            documentReference.update("user", map)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            toaster.text("Added new category");
 
-                        listOfCategories.add(categoryMap);
+                                            fragmentHomeHelper.showScrollViewAndHideLinearLayout();
+                                            fragmentHomeHelper.buildUILayoutForCategory(new Category(categoryID, name, new ArrayList<>()));
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d("Tag", "Failed to add new category");
+                                        }
+                                    });
+                        } else {
+                            long categoryId = UUID.randomUUID().getLeastSignificantBits() * -1;
+                            Map<String, Object> categoryMap = new HashMap<>();
+                            categoryMap.put("id", categoryId);
+                            categoryMap.put("name", name);
+                            categoryMap.put("postList", new ArrayList<>());
 
-                        map.put("categoryList", listOfCategories);
+                            List<Map<String, Object>> categoryList = new ArrayList<>();
+                            categoryList.add(categoryMap);
 
-                        documentReference.update("user", map)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        toaster.text("Added new category");
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("imageUrl", "");
+                            userMap.put("categoryList", categoryList);
 
-                                        fragmentHomeHelper.showScrollViewAndHideLinearLayout();
-                                        fragmentHomeHelper.buildUILayoutForCategory(new Category(name, new ArrayList<>()));
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d("Tag", "Failed to add new category");
-                                    }
-                                });
+                            Map<String, Object> finalMap = new HashMap<>();
+                            finalMap.put("user", userMap);
+                            documentReference.set(finalMap)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            toaster.text("Added new category");
+
+                                            fragmentHomeHelper.showScrollViewAndHideLinearLayout();
+                                            fragmentHomeHelper.buildUILayoutForCategory(new Category(categoryId, name, new ArrayList<>()));
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d("Tag", e.getLocalizedMessage());
+                                        }
+                                    });
+                        }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -181,7 +224,7 @@ public class CategoryRepository implements ICategoriesRepository {
     }
 
     @Override
-    public void delete(String name) {
+    public void deleteById(long id) {
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -190,16 +233,15 @@ public class CategoryRepository implements ICategoriesRepository {
                         Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
                         List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
-                        for (Map<String, Object> map1: listOfCategories){
-                            String title = (String) map1.get("name");
-                            if (title.equalsIgnoreCase(name)){
+                        for (Map<String, Object> map1 : listOfCategories) {
+                            long cid = Long.parseLong(String.valueOf(map1.get("id")));
+                            if (id == cid) {
                                 listOfCategories.remove(map1);
                                 break;
                             }
                         }
 
                         map.put("categoryList", listOfCategories);
-
                         documentReference.update("user", map)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
