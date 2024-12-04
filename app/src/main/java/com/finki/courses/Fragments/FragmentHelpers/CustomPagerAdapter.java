@@ -12,6 +12,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.finki.courses.Fragments.FragmentSingleImage;
 import com.finki.courses.Fragments.ImageSliderFragment;
 import com.finki.courses.Model.Post;
+import com.finki.courses.databinding.FragmentImageSliderBinding;
 
 import java.util.List;
 import java.util.Map;
@@ -20,12 +21,15 @@ public class CustomPagerAdapter extends FragmentStateAdapter {
 
     private Context context;
     private Activity activity;
+    private FragmentImageSliderBinding fragmentImageSliderBinding;
     private List<Map<String, Object>> postList;
-    public CustomPagerAdapter(Context context, FragmentActivity fragmentActivity, List<Map<String, Object>> postList) {
+    public CustomPagerAdapter(Context context, FragmentActivity fragmentActivity,
+                              FragmentImageSliderBinding fragmentImageSliderBinding, List<Map<String, Object>> postList) {
         super(fragmentActivity);
 
         this.context = context;
         this.activity = fragmentActivity;
+        this.fragmentImageSliderBinding = fragmentImageSliderBinding;
         this.postList = postList;
     }
 
@@ -33,7 +37,7 @@ public class CustomPagerAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         Map<String, Object> postMap = postList.get(position);
-        return new FragmentSingleImage(postMap);
+        return new FragmentSingleImage(postMap, fragmentImageSliderBinding);
     }
 
     @Override

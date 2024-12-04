@@ -58,7 +58,7 @@ public class ImageSliderFragment extends Fragment implements IEssentials {
 
     @Override
     public void instantiateObjects() {
-        customPagerAdapter = new CustomPagerAdapter(getContext(), getActivity(), listOfMaps);
+        customPagerAdapter = new CustomPagerAdapter(getContext(), getActivity(), binding, listOfMaps);
         binding.viewPager2FragmentImageSlider.setAdapter(customPagerAdapter);
         binding.viewPager2FragmentImageSlider.setCurrentItem(currentImagePosition);
 

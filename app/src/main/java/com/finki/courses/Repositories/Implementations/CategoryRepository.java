@@ -237,27 +237,26 @@ public class CategoryRepository implements ICategoriesRepository {
                             long cid = Long.parseLong(String.valueOf(map1.get("id")));
                             if (id == cid) {
                                 listOfCategories.remove(map1);
+
+                                map.put("categoryList", listOfCategories);
+                                documentReference.update("user", map)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+
+                                                fragmentHomeHelper.deleteUILayoutForCategory(id);
+                                                toaster.text("Deleted category");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.d("Tag", e.getLocalizedMessage());
+                                            }
+                                        });
                                 break;
                             }
                         }
-
-                        map.put("categoryList", listOfCategories);
-                        documentReference.update("user", map)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        // Neka se izbrishe samo voa VIEW GROUP a ne cela da se pre brishe od pochetok
-                                        // No za toa ke ni e potrebno da gi grupirame header i content layouts
-                                        listAll();
-                                        toaster.text("Deleted category");
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d("Tag", e.getLocalizedMessage());
-                                    }
-                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

@@ -32,6 +32,7 @@ import com.finki.courses.Model.Post;
 import com.finki.courses.Model.User;
 import com.finki.courses.R;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
+import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -64,6 +65,7 @@ public class FragmentHomeHelper {
     private MainActivityHelper mainActivityHelper;
 
     private CategoryRepository categoryRepository;
+    private PostRepository postRepository;
     private Toaster toaster;
 
     public FragmentHomeHelper(Context context, FragmentHomeBinding binding, MainActivityHelper mainActivityHelper) {
@@ -71,6 +73,7 @@ public class FragmentHomeHelper {
         this.binding = binding;
         this.mainActivityHelper = mainActivityHelper;
 
+        this.postRepository = new PostRepository(context, mainActivityHelper, binding);
         this.categoryRepository = new CategoryRepository(context, binding, this);
         this.toaster = new Toaster(context);
     }
@@ -109,18 +112,28 @@ public class FragmentHomeHelper {
     public void buildUILayoutForCategory(Category category) {
         List<Map<String, Object>> postList = category.getPostList();
 
-        buildUIHeaderForCategory(category);
-        // No posts
+        LinearLayout.LayoutParams layoutParamsFullLinearLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsFullLinearLayout.setMargins(0,0,0,0);
+
+        LinearLayout linearLayoutFullCategory = new LinearLayout(context);
+        linearLayoutFullCategory.setOrientation(LinearLayout.VERTICAL);
+        linearLayoutFullCategory.setLayoutParams(layoutParamsFullLinearLayout);
+        linearLayoutFullCategory.setTag(String.valueOf(category.getId()));
+
+        RelativeLayout relativeLayoutHeader = buildUIHeaderForCategory(category);
+        linearLayoutFullCategory.addView(relativeLayoutHeader);
         if (postList.isEmpty()) {
-            buildAnEmptyUILayoutForCategory(category);
+            LinearLayout linearLayoutEmptyCategories = buildAnEmptyUILayoutForCategory(category);
+            linearLayoutFullCategory.addView(linearLayoutEmptyCategories);
+        } else {
+            HorizontalScrollView horizontalScrollViewCategories = buildPostsUILayoutForCategory(category, postList);
+            linearLayoutFullCategory.addView(horizontalScrollViewCategories);
         }
-        // Yes posts
-        else {
-            buildPostsUILayoutForCategory(postList);
-        }
+
+        binding.linearLayoutCategories.addView(linearLayoutFullCategory);
     }
 
-    private void buildUIHeaderForCategory(Category category) {
+    private RelativeLayout buildUIHeaderForCategory(Category category) {
         LinearLayout.LayoutParams layoutParamsLinearHeader = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearHeader.setMargins(48, 0, 48, 42);
 
@@ -214,10 +227,10 @@ public class FragmentHomeHelper {
         relativeLayoutHeader.addView(imageViewIconDelete);
         relativeLayoutHeader.addView(textViewCategoryTitle);
 
-        binding.linearLayoutCategories.addView(relativeLayoutHeader);
+        return relativeLayoutHeader;
     }
 
-    private void buildAnEmptyUILayoutForCategory(Category category) {
+    private LinearLayout buildAnEmptyUILayoutForCategory(Category category) {
         LinearLayout.LayoutParams layoutParamsLinearLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearLayout.setMargins(48, 0, 48, 64);
 
@@ -259,11 +272,11 @@ public class FragmentHomeHelper {
         linearLayout.addView(textViewNoPostsYet);
         linearLayout.addView(button);
 
-        binding.linearLayoutCategories.addView(linearLayout);
+        return linearLayout;
     }
 
-    private void buildPostsUILayoutForCategory(List<Map<String, Object>> postList) {
-        LinearLayout.LayoutParams layoutParamsHorizontalScrollView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
+    private HorizontalScrollView buildPostsUILayoutForCategory(Category category, List<Map<String, Object>> postList) {
+        LinearLayout.LayoutParams layoutParamsHorizontalScrollView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 650);
         layoutParamsHorizontalScrollView.setMargins(48, 0, 48, 64);
 
         HorizontalScrollView horizontalScrollView = new HorizontalScrollView(context);
@@ -287,11 +300,11 @@ public class FragmentHomeHelper {
             LinearLayout.LayoutParams layoutParamsMaterialCardView = new LinearLayout.LayoutParams(350, ViewGroup.LayoutParams.MATCH_PARENT);
 
             if (i == 0) {
-                layoutParamsMaterialCardView.setMargins(0, 0, 16, 0);
+                layoutParamsMaterialCardView.setMargins(0, 0, 8, 0);
             } else if (i == 5) {
-                layoutParamsMaterialCardView.setMargins(16, 0, 0, 0);
+                layoutParamsMaterialCardView.setMargins(8, 0, 0, 0);
             } else {
-                layoutParamsMaterialCardView.setMargins(16, 0, 16, 0);
+                layoutParamsMaterialCardView.setMargins(8, 0, 8, 0);
             }
 
             MaterialCardView materialCardView = new MaterialCardView(context);
@@ -303,6 +316,34 @@ public class FragmentHomeHelper {
             materialCardView.setOnClickListener(view -> {
                 // Change to imageViewSliderFragment
                 mainActivityHelper.changeFragments(new ImageSliderFragment(mainActivityHelper, postList, finalI), true);
+            });
+
+            materialCardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+                    builder.setTitle("Delete")
+                            .setMessage("Are you sure you want to delete this post ?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    long postId = Long.parseLong(String.valueOf(postMap.get("id")));
+
+                                    postRepository.deleteById(category.getId(), postId);
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    toaster.text("That's what I thought");
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setCancelable(true)
+                            .show();
+
+                    return true;
+                }
             });
 
 
@@ -323,7 +364,27 @@ public class FragmentHomeHelper {
         }
 
         horizontalScrollView.addView(linearLayout);
-        binding.linearLayoutCategories.addView(horizontalScrollView);
+
+        return horizontalScrollView;
+    }
+
+    public void deleteUILayoutForCategory(long id){
+        LinearLayout mainLinearLayout = binding.linearLayoutCategories;
+
+        for (int i=0;i<mainLinearLayout.getChildCount();i++){
+            LinearLayout linearLayoutCategory = (LinearLayout) mainLinearLayout.getChildAt(i);
+            long tag = Long.parseLong(linearLayoutCategory.getTag().toString());
+
+            if (tag == id){
+                mainLinearLayout.removeViewAt(i);
+                break;
+            }
+        }
+
+        if (mainLinearLayout.getChildCount() <= 0)
+            hideScrollViewAndShowLinearLayout();
+        else
+            showScrollViewAndHideLinearLayout();
     }
 
 

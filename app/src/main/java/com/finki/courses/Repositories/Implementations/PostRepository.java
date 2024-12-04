@@ -5,24 +5,30 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
+import com.finki.courses.Fragments.FragmentHelpers.FragmentHomeHelper;
 import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
 import com.finki.courses.Repositories.IPostRepository;
 import com.finki.courses.databinding.FragmentAddPostBinding;
+import com.finki.courses.databinding.FragmentHomeBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -35,14 +41,27 @@ public class PostRepository implements IPostRepository {
 
     private Context context;
     private Toaster toaster;
-    private final String email;
-    private final StorageReference storageReference;
-    private final FirebaseAuth firebaseAuth;
-    private final FirebaseFirestore firebaseFirestore;
-    private final FragmentAddPostBinding fragmentAddPostBinding;
-    private final MainActivityHelper mainActivityHelper;
-    private final ProgressDialog progressDialog;
+    private String email;
+    private StorageReference storageReference;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firebaseFirestore;
+    private FragmentAddPostBinding fragmentAddPostBinding;
+    private MainActivityHelper mainActivityHelper;
+    private ProgressDialog progressDialog;
+    private FragmentHomeBinding fragmentHomeBinding;
 
+    // FragmentHome usage
+    public PostRepository(Context context, MainActivityHelper mainActivityHelper, FragmentHomeBinding fragmentHomeBinding) {
+        this.context = context;
+        this.firebaseFirestore = FirebaseFirestore.getInstance();
+        this.firebaseAuth = FirebaseAuth.getInstance();
+        this.storageReference = FirebaseStorage.getInstance().getReference();
+        this.toaster = new Toaster(context);
+        this.mainActivityHelper = mainActivityHelper;
+        this.fragmentHomeBinding = fragmentHomeBinding;
+    }
+
+    // FragmentAddPost usage
     public PostRepository(Context context, FragmentAddPostBinding fragmentAddPostBinding,
                           MainActivityHelper mainActivityHelper, StorageReference storageReference) {
         this.context = context;
@@ -72,18 +91,18 @@ public class PostRepository implements IPostRepository {
                         List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
                         boolean check = false;
-                        for (Map<String, Object> map1: listOfCategories){
+                        for (Map<String, Object> map1 : listOfCategories) {
                             long cid = Long.parseLong(String.valueOf(map1.get("id")));
                             List<Post> postList = (List<Post>) map1.get("postList");
 
-                            if (cid == categoryId){
+                            if (cid == categoryId) {
                                 postList.add(post);
                                 check = true;
                                 break;
                             }
                         }
 
-                        if (check){
+                        if (check) {
                             map.put("categoryList", listOfCategories);
                             documentReference.update("user", map)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -128,12 +147,6 @@ public class PostRepository implements IPostRepository {
                     }
                 });
     }
-
-    @Override
-    public void deleteById(long categoryId, long postId) {
-
-    }
-
 
     @Override
     public void uploadImage(Category category, InputStream inputStream) {
@@ -183,4 +196,121 @@ public class PostRepository implements IPostRepository {
                     }
                 });
     }
+
+    @Override
+    public void deleteById(long categoryId, long postId) {
+        ProgressDialog progressDialogDelete = new ProgressDialog(context);
+        progressDialogDelete.setTitle("Deleting");
+        progressDialogDelete.setCancelable(false);
+        progressDialogDelete.show();
+
+        String email = firebaseAuth.getCurrentUser().getEmail();
+        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
+        documentReference.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot snapshot = task.getResult();
+
+                            Map<String, Object> userMap = (Map<String, Object>) snapshot.get("user");
+                            List<Map<String, Object>> categoryList = (List<Map<String, Object>>) userMap.get("categoryList");
+
+                            boolean checkRemoval = false;
+                            String imageName;
+
+                            for (Map<String, Object> mapCategory : categoryList) {
+                                long catId = Long.parseLong(String.valueOf(mapCategory.get("id")));
+                                if (catId == categoryId) {
+                                    List<Map<String, Object>> postList = (List<Map<String, Object>>) mapCategory.get("postList");
+                                    for (Map<String, Object> mapPost : postList) {
+                                        long pId = Long.parseLong(String.valueOf(mapPost.get("id")));
+                                        if (postId == pId) {
+                                            // Post found //
+
+                                            postList.remove(mapPost);
+                                            checkRemoval = true;
+
+                                            mapCategory.put("postList", postList);
+                                            userMap.put("categoryList", categoryList);
+
+                                            imageName = String.valueOf(mapPost.get("name"));
+
+                                            StorageReference imageRef = storageReference.child(imageName);
+                                            imageRef.delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            Log.d("Tag", "Removed from cloud storage");
+                                                            documentReference.update("user", userMap)
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void unused) {
+                                                                            toaster.text("Removed successfully");
+                                                                            Log.d("Tag", "Removed from firebase firestore");
+
+                                                                            // Find the layout with categoryID => then find the post with post id
+
+                                                                            // redirect:/home fragment
+                                                                            mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
+                                                                            progressDialogDelete.hide();
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.d("Tag", e.getLocalizedMessage());
+                                                                            progressDialogDelete.hide();
+                                                                        }
+                                                                    });
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.d("Tag", e.getLocalizedMessage());
+                                                            progressDialogDelete.hide();
+                                                        }
+                                                    });
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (checkRemoval) {
+                                    progressDialogDelete.hide();
+                                    break;
+                                }
+                            }
+
+                        } else {
+                            toaster.text("Task failed");
+                            Log.d("Tag", "Task failed");
+                            progressDialogDelete.hide();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        toaster.text(e.getLocalizedMessage());
+                        Log.d("Tag", e.getLocalizedMessage());
+                        progressDialogDelete.hide();
+                    }
+                });
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
