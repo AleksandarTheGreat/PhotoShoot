@@ -27,7 +27,6 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 
-
 public class FragmentHome extends Fragment implements IEssentials {
 
     private FragmentHomeBinding binding;
