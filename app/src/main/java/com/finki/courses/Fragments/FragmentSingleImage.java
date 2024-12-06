@@ -35,7 +35,7 @@ public class FragmentSingleImage extends Fragment implements IEssentials {
     private Map<String, Object> postMap;
     private Toaster toaster;
 
-    public FragmentSingleImage(){
+    public FragmentSingleImage() {
 
     }
 

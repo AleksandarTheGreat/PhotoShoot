@@ -9,5 +9,6 @@
       <option name="minLength" value="1408" />
     </inspection_tool>
     <inspection_tool class="UNCHECKED_WARNING" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UseBulkOperation" enabled="false" level="WARNING" enabled_by_default="false" />
   </profile>
 </component>

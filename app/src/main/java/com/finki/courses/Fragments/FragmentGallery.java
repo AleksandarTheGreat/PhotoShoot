@@ -4,23 +4,33 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
+import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
+import com.finki.courses.Fragments.FragmentHelpers.FragmentGalleryHelper;
 import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
+import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.databinding.FragmentGalleryBinding;
 
 
 public class FragmentGallery extends Fragment implements IEssentials {
 
     private FragmentGalleryBinding binding;
+    private FragmentGalleryHelper fragmentGalleryHelper;
     private Toaster toaster;
+    private PostRepository postRepository;
+    private MainActivityHelper mainActivityHelper;
 
-    public FragmentGallery() {
+    public FragmentGallery(MainActivityHelper mainActivityHelper) {
         // Required empty public constructor
+        this.mainActivityHelper = mainActivityHelper;
     }
 
     @Override
@@ -38,6 +48,16 @@ public class FragmentGallery extends Fragment implements IEssentials {
     public void instantiateObjects() {
         toaster = new Toaster(getContext());
         toaster.text("New gallery");
+
+        fragmentGalleryHelper = new FragmentGalleryHelper(getContext(), binding, mainActivityHelper);
+
+        postRepository = new PostRepository(getContext(), fragmentGalleryHelper);
+        postRepository.listAll();
+
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+
+        Log.d("Tag", "Width: " + width + ", Height: " + height);
     }
 
     @Override

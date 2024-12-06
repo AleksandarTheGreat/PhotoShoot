@@ -19,10 +19,10 @@ import java.util.Map;
 
 public class CustomPagerAdapter extends FragmentStateAdapter {
 
-    private Context context;
-    private Activity activity;
-    private FragmentImageSliderBinding fragmentImageSliderBinding;
-    private List<Map<String, Object>> postList;
+    private final Context context;
+    private final Activity activity;
+    private final FragmentImageSliderBinding fragmentImageSliderBinding;
+    private final List<Map<String, Object>> postList;
     public CustomPagerAdapter(Context context, FragmentActivity fragmentActivity,
                               FragmentImageSliderBinding fragmentImageSliderBinding, List<Map<String, Object>> postList) {
         super(fragmentActivity);

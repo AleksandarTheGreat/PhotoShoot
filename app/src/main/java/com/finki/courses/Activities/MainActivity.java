@@ -70,7 +70,7 @@ public class MainActivity extends ParentActivity {
 
         fragmentHome = new FragmentHome(mainActivityHelper);
         fragmentUser = new FragmentUser(mainActivityHelper);
-        fragmentGallery = new FragmentGallery();
+        fragmentGallery = new FragmentGallery(mainActivityHelper);
 
         toaster = new Toaster(MainActivity.this);
 

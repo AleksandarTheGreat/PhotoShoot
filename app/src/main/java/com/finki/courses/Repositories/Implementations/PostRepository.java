@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
+import com.finki.courses.Fragments.FragmentHelpers.FragmentGalleryHelper;
 import com.finki.courses.Fragments.FragmentHelpers.FragmentHomeHelper;
 import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Helper.Implementations.Toaster;
@@ -19,6 +20,7 @@ import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
 import com.finki.courses.Repositories.IPostRepository;
 import com.finki.courses.databinding.FragmentAddPostBinding;
+import com.finki.courses.databinding.FragmentGalleryBinding;
 import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,6 +35,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -48,17 +51,17 @@ public class PostRepository implements IPostRepository {
     private FragmentAddPostBinding fragmentAddPostBinding;
     private MainActivityHelper mainActivityHelper;
     private ProgressDialog progressDialog;
-    private FragmentHomeBinding fragmentHomeBinding;
+    private FragmentGalleryHelper fragmentGalleryHelper;
+
 
     // FragmentHome usage
-    public PostRepository(Context context, MainActivityHelper mainActivityHelper, FragmentHomeBinding fragmentHomeBinding) {
+    public PostRepository(Context context, MainActivityHelper mainActivityHelper) {
         this.context = context;
         this.firebaseFirestore = FirebaseFirestore.getInstance();
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.storageReference = FirebaseStorage.getInstance().getReference();
         this.toaster = new Toaster(context);
         this.mainActivityHelper = mainActivityHelper;
-        this.fragmentHomeBinding = fragmentHomeBinding;
     }
 
     // FragmentAddPost usage
@@ -75,6 +78,16 @@ public class PostRepository implements IPostRepository {
 
         this.toaster = new Toaster(context);
         this.progressDialog = new ProgressDialog(context);
+    }
+
+    // FragmentGallery usage
+    public PostRepository(Context context, FragmentGalleryHelper fragmentGalleryHelper){
+        this.toaster = new Toaster(context);
+
+        this.firebaseAuth = FirebaseAuth.getInstance();
+        this.firebaseFirestore = FirebaseFirestore.getInstance();
+
+        this.fragmentGalleryHelper = fragmentGalleryHelper;
     }
 
     @Override
@@ -296,6 +309,46 @@ public class PostRepository implements IPostRepository {
                         toaster.text(e.getLocalizedMessage());
                         Log.d("Tag", e.getLocalizedMessage());
                         progressDialogDelete.hide();
+                    }
+                });
+    }
+
+    @Override
+    public void listAll() {
+        String userEmail = firebaseAuth.getCurrentUser().getEmail();
+
+        DocumentReference documentReference = firebaseFirestore.collection("Users").document(userEmail);
+        documentReference.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            Map<String,Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
+
+                            List<Map<String, Object>> allPostsList = new ArrayList<>();
+                            List<Map<String, Object>> categoryList = (List<Map<String, Object>>) userMap.get("categoryList");
+
+                            for (Map<String, Object> categoryMap: categoryList){
+                                List<Map<String, Object>> postsList = (List<Map<String, Object>>) categoryMap.get("postList");
+                                for (Map<String, Object> postMap: postsList){
+                                    allPostsList.add(postMap);
+                                }
+                            }
+
+                            fragmentGalleryHelper.buildImages(allPostsList);
+
+                            Log.d("Tag", allPostsList.toString());
+                        } else {
+                            toaster.text("Document for '" + userEmail + "' likely doesn't exist");
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        toaster.text(e.getLocalizedMessage());
+                        Log.d("Tag", e.getLocalizedMessage());
                     }
                 });
     }

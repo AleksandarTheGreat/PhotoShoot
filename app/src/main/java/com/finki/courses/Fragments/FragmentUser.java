@@ -55,7 +55,7 @@ public class FragmentUser extends Fragment implements IEssentials {
     @Override
     public void addEventListeners() {
         binding.buttonViewAll.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentGallery(), true);
+            mainActivityHelper.changeFragments(new FragmentGallery(mainActivityHelper), true);
             mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemGallery);
         });
 

@@ -73,7 +73,7 @@ public class FragmentHomeHelper {
         this.binding = binding;
         this.mainActivityHelper = mainActivityHelper;
 
-        this.postRepository = new PostRepository(context, mainActivityHelper, binding);
+        this.postRepository = new PostRepository(context, mainActivityHelper);
         this.categoryRepository = new CategoryRepository(context, binding, this);
         this.toaster = new Toaster(context);
     }
@@ -164,7 +164,7 @@ public class FragmentHomeHelper {
         imageViewIconViewAll.setLayoutParams(layoutParamsImageIcon1);
         imageViewIconViewAll.setOnClickListener(view -> {
             mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemGallery);
-            mainActivityHelper.changeFragments(new FragmentGallery(), true);
+            mainActivityHelper.changeFragments(new FragmentGallery(mainActivityHelper), true);
         });
 
 
