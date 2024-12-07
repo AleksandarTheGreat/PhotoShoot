@@ -14,6 +14,7 @@ import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
 import com.finki.courses.Fragments.FragmentHelpers.FragmentGalleryHelper;
 import com.finki.courses.Fragments.FragmentHelpers.FragmentHomeHelper;
+import com.finki.courses.Fragments.FragmentHelpers.FragmentUserHelper;
 import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
@@ -22,6 +23,7 @@ import com.finki.courses.Repositories.IPostRepository;
 import com.finki.courses.databinding.FragmentAddPostBinding;
 import com.finki.courses.databinding.FragmentGalleryBinding;
 import com.finki.courses.databinding.FragmentHomeBinding;
+import com.finki.courses.databinding.FragmentUserBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -52,7 +54,6 @@ public class PostRepository implements IPostRepository {
     private FragmentAddPostBinding fragmentAddPostBinding;
     private MainActivityHelper mainActivityHelper;
     private ProgressDialog progressDialog;
-    private FragmentGalleryHelper fragmentGalleryHelper;
 
 
     // FragmentHome usage
@@ -81,13 +82,13 @@ public class PostRepository implements IPostRepository {
     }
 
     // FragmentGallery usage
-    public PostRepository(Context context, FragmentGalleryHelper fragmentGalleryHelper){
-        this.toaster = new Toaster(context);
+    public PostRepository(Context context){
+        this.context = context;
 
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.firebaseFirestore = FirebaseFirestore.getInstance();
 
-        this.fragmentGalleryHelper = fragmentGalleryHelper;
+        this.toaster = new Toaster(context);
     }
 
     @Override
@@ -314,7 +315,7 @@ public class PostRepository implements IPostRepository {
     }
 
     @Override
-    public void listAllForGallery() {
+    public void listAllForGallery(FragmentGalleryHelper fragmentGalleryHelper) {
         String userEmail = firebaseAuth.getCurrentUser().getEmail();
 
         DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(userEmail);
@@ -354,8 +355,42 @@ public class PostRepository implements IPostRepository {
     }
 
     @Override
-    public void listAllForUser() {
+    public void listAllForUser(FragmentUserHelper fragmentUserHelper) {
+        String email = firebaseAuth.getCurrentUser().getEmail();
 
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
+        documentReference.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
+
+                            List<Map<String, Object>> allPosts = new ArrayList<>();
+                            List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) userMap.get("categoryList");
+
+                            for (Map<String, Object> categoryMap: listOfCategories){
+                                List<Map<String, Object>> postList = (List<Map<String, Object>>) categoryMap.get("postList");
+                                for (Map<String, Object> postMap: postList){
+                                    allPosts.add(postMap);
+                                }
+                            }
+
+                            fragmentUserHelper.buildImages(listOfCategories, allPosts);
+
+                        } else {
+                            toaster.text("Failed to retrieve document with email '" + email + "'");
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        toaster.text(e.getLocalizedMessage());
+                        Log.d("Tag", e.getLocalizedMessage());
+                    }
+                });
     }
 }
 

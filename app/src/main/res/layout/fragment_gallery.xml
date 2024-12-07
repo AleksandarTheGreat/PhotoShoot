@@ -5,14 +5,61 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.FragmentGallery">
 
-    <GridLayout
-        android:id="@+id/gridLayout"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnCount="4"
-        android:layout_gravity="center_horizontal">
+        android:orientation="vertical">
 
-    </GridLayout>
+        <GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:columnCount="4"
+            android:visibility="gone">
 
+        </GridLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutEmptyGalleryFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginBottom="24dp"
+                />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Oops, looks like you don't"
+                android:textSize="20sp"
+                />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="have any posts yet"
+                android:textSize="20sp"
+                android:layout_marginBottom="12dp"
+                />
+
+            <Button
+                android:id="@+id/buttonICanFixThat"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="I can fix that"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </ScrollView>

@@ -50,8 +50,8 @@ public class FragmentGallery extends Fragment implements IEssentials {
 
         fragmentGalleryHelper = new FragmentGalleryHelper(getContext(), binding, mainActivityHelper);
 
-        postRepository = new PostRepository(getContext(), fragmentGalleryHelper);
-        postRepository.listAllForGallery();
+        postRepository = new PostRepository(getContext());
+        postRepository.listAllForGallery(fragmentGalleryHelper);
 
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
@@ -61,7 +61,9 @@ public class FragmentGallery extends Fragment implements IEssentials {
 
     @Override
     public void addEventListeners() {
-
+        binding.buttonICanFixThat.setOnClickListener(view -> {
+            mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
+        });
     }
 
     @Override

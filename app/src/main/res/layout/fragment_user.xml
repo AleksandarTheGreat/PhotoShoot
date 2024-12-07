@@ -35,34 +35,98 @@
             android:layout_marginBottom="48dp"
             />
 
-        <TextView
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Total categories 30"
-            android:layout_marginBottom="12dp"
-            />
-
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Total posts 3195"
-            android:layout_marginBottom="24dp"
-            />
-
-        <Button
-            android:id="@+id/buttonViewAll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginBottom="8dp"
-            android:text="View all"
-            />
+            android:gravity="center">
 
-        <Button
-            android:id="@+id/buttonSignOut"
-            android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginHorizontal="16dp"
+                >
+
+                <TextView
+                    android:id="@+id/textViewTotalCategories"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Categories  30"
+                    android:textSize="18sp"
+                    android:layout_marginBottom="4dp"
+                    />
+
+                <TextView
+                    android:id="@+id/textViewTotalPosts"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Posts  3195"
+                    android:textSize="18sp"
+                    />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/buttonSignOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sign out"
+                android:layout_marginHorizontal="16dp"
+                style="@style/Widget.Material3.Button.TextButton"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutEmptyUserFragment"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign out"
-            style="@style/Widget.Material3.Button.TextButton"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginBottom="24dp"
+                />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Oops, looks like you don't"
+                android:textSize="20sp"
+                />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="have any posts yet"
+                android:textSize="20sp"
+                android:layout_marginBottom="12dp"
+                />
+
+            <Button
+                android:id="@+id/buttonICanFixThat"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="I can fix that"
+                />
+
+        </LinearLayout>
+
+        <GridLayout
+            android:id="@+id/gridLayoutPostsUserFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:columnCount="3"
+            android:layout_gravity="start"
+            android:visibility="gone"
             />
 
     </LinearLayout>

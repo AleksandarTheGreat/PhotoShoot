@@ -3,6 +3,8 @@ package com.finki.courses.Fragments.FragmentHelpers;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.view.View;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -32,6 +34,15 @@ public class FragmentGalleryHelper {
     }
 
     public void buildImages(List<Map<String, Object>> allPostsList) {
+        if (allPostsList.isEmpty()){
+            fragmentGalleryBinding.linearLayoutEmptyGalleryFragment.setVisibility(View.VISIBLE);
+            fragmentGalleryBinding.gridLayout.setVisibility(View.GONE);
+            return;
+        }
+
+        fragmentGalleryBinding.linearLayoutEmptyGalleryFragment.setVisibility(View.GONE);
+        fragmentGalleryBinding.gridLayout.setVisibility(View.VISIBLE);
+
         int width = context.getResources().getDisplayMetrics().widthPixels;
         int height = context.getResources().getDisplayMetrics().heightPixels;
 
