@@ -64,7 +64,6 @@ public class FragmentHome extends Fragment implements IEssentials {
         categoryRepository.listAll();
 
         toaster = new Toaster(getContext());
-        toaster.text("Called again");
     }
 
     @Override

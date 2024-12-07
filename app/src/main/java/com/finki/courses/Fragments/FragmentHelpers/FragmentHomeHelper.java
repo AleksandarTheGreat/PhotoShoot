@@ -133,6 +133,7 @@ public class FragmentHomeHelper {
         binding.linearLayoutCategories.addView(linearLayoutFullCategory);
     }
 
+    @SuppressLint("SetTextI18n")
     private RelativeLayout buildUIHeaderForCategory(Category category) {
         LinearLayout.LayoutParams layoutParamsLinearHeader = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearHeader.setMargins(48, 0, 48, 42);
@@ -142,36 +143,33 @@ public class FragmentHomeHelper {
         relativeLayoutHeader.setGravity(Gravity.START);
 
 
-        RelativeLayout.LayoutParams layoutParamsTextView = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsTextView.setMargins(0, 0, 0, 24);
-        layoutParamsTextView.addRule(RelativeLayout.CENTER_VERTICAL);
+        RelativeLayout.LayoutParams layoutParamsTextViewName = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsTextViewName.setMargins(0, 0, 0, 24);
+        layoutParamsTextViewName.addRule(RelativeLayout.CENTER_VERTICAL);
 
         TextView textViewCategoryTitle = new TextView(context);
-        textViewCategoryTitle.setTextSize(18);
+        textViewCategoryTitle.setId(View.generateViewId());
+        textViewCategoryTitle.setTextSize(20);
         textViewCategoryTitle.setTypeface(Typeface.DEFAULT_BOLD);
         textViewCategoryTitle.setText(category.getName());
-        textViewCategoryTitle.setLayoutParams(layoutParamsTextView);
+        textViewCategoryTitle.setLayoutParams(layoutParamsTextViewName);
 
 
-        // Icon view all
-        RelativeLayout.LayoutParams layoutParamsImageIcon1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsImageIcon1.setMargins(8, 0, 8, 0);
-        layoutParamsImageIcon1.addRule(RelativeLayout.ALIGN_PARENT_END);
-        layoutParamsImageIcon1.addRule(RelativeLayout.CENTER_VERTICAL);
+        RelativeLayout.LayoutParams layoutParamsTextViewSize = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsTextViewSize.setMargins(0,24,0,0);
+        layoutParamsTextViewSize.addRule(RelativeLayout.BELOW, textViewCategoryTitle.getId());
 
-        ImageView imageViewIconViewAll = new ImageView(context);
-        imageViewIconViewAll.setId(View.generateViewId());
-        imageViewIconViewAll.setLayoutParams(layoutParamsImageIcon1);
-        imageViewIconViewAll.setOnClickListener(view -> {
-            mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemGallery);
-            mainActivityHelper.changeFragments(new FragmentGallery(mainActivityHelper), true);
-        });
+        TextView textViewSize = new TextView(context);
+        textViewSize.setTextSize(14);
+        textViewSize.setText(category.getPostList().size() + " images in this category");
+        textViewSize.setLayoutParams(layoutParamsTextViewSize);
+
 
 
         // Icon add post
         RelativeLayout.LayoutParams layoutParamsImageIcon2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsImageIcon2.setMargins(8, 0, 8, 0);
-        layoutParamsImageIcon2.addRule(RelativeLayout.LEFT_OF, imageViewIconViewAll.getId());
+        layoutParamsImageIcon2.addRule(RelativeLayout.ALIGN_PARENT_END);
         layoutParamsImageIcon2.addRule(RelativeLayout.CENTER_VERTICAL);
 
         ImageView imageViewIconAddPost = new ImageView(context);
@@ -193,7 +191,7 @@ public class FragmentHomeHelper {
         imageViewIconDelete.setLayoutParams(layoutParamsImageIcon3);
         imageViewIconDelete.setOnClickListener(view -> {
             new MaterialAlertDialogBuilder(context)
-                    .setTitle("Alert")
+                    .setTitle("Delete category!")
                     .setMessage("Are you sure you want to delete '" + category.getName() + "' category")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
@@ -213,19 +211,17 @@ public class FragmentHomeHelper {
 
 
         if (ThemeUtils.isNightModeOn(context)) {
-            imageViewIconViewAll.setImageResource(R.drawable.ic_list_night);
             imageViewIconAddPost.setImageResource(R.drawable.ic_add_night);
             imageViewIconDelete.setImageResource(R.drawable.ic_delete_night);
         } else {
-            imageViewIconViewAll.setImageResource(R.drawable.ic_list_day);
             imageViewIconAddPost.setImageResource(R.drawable.ic_add_day);
             imageViewIconDelete.setImageResource(R.drawable.ic_delete_day);
         }
 
-        relativeLayoutHeader.addView(imageViewIconViewAll);
         relativeLayoutHeader.addView(imageViewIconAddPost);
         relativeLayoutHeader.addView(imageViewIconDelete);
         relativeLayoutHeader.addView(textViewCategoryTitle);
+        relativeLayoutHeader.addView(textViewSize);
 
         return relativeLayoutHeader;
     }

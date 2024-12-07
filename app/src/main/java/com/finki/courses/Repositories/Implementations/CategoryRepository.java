@@ -35,6 +35,7 @@ import java.util.function.Consumer;
 
 public class CategoryRepository implements ICategoriesRepository {
 
+    private static final String COLLECTION_NAME = "Users";
     private final Context context;
     private final FragmentHomeBinding binding;
     private final FragmentHomeHelper fragmentHomeHelper;
@@ -63,7 +64,7 @@ public class CategoryRepository implements ICategoriesRepository {
         binding.linearLayoutCategories.removeAllViews();
         categoryList = new ArrayList<>();
 
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -118,7 +119,7 @@ public class CategoryRepository implements ICategoriesRepository {
     @Override
     public Category findCategoryById(long id) {
         Category category;
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -147,7 +148,7 @@ public class CategoryRepository implements ICategoriesRepository {
     @Override
     public void add(String name) {
         // Get the document corresponding to that email
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -225,7 +226,7 @@ public class CategoryRepository implements ICategoriesRepository {
 
     @Override
     public void deleteById(long id) {
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override

@@ -26,6 +26,7 @@ import java.util.Map;
 
 public class AuthenticationRepository implements IAuthenticationRepository {
 
+    private static final String COLLECTION_NAME = "Users";
     private Context context;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -74,7 +75,7 @@ public class AuthenticationRepository implements IAuthenticationRepository {
                         userMap.put("user", user);
 
                         String documentName = firebaseUser.getEmail().toString();
-                        firebaseFirestore.collection("Users").document(documentName)
+                        firebaseFirestore.collection(COLLECTION_NAME).document(documentName)
                                 .set(userMap)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override

@@ -47,12 +47,11 @@ public class FragmentGallery extends Fragment implements IEssentials {
     @Override
     public void instantiateObjects() {
         toaster = new Toaster(getContext());
-        toaster.text("New gallery");
 
         fragmentGalleryHelper = new FragmentGalleryHelper(getContext(), binding, mainActivityHelper);
 
         postRepository = new PostRepository(getContext(), fragmentGalleryHelper);
-        postRepository.listAll();
+        postRepository.listAllForGallery();
 
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;

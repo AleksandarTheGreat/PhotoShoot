@@ -42,6 +42,7 @@ import java.util.UUID;
 
 public class PostRepository implements IPostRepository {
 
+    private static final String COLLECTION_NAME = "Users";
     private Context context;
     private Toaster toaster;
     private String email;
@@ -65,12 +66,11 @@ public class PostRepository implements IPostRepository {
     }
 
     // FragmentAddPost usage
-    public PostRepository(Context context, FragmentAddPostBinding fragmentAddPostBinding,
-                          MainActivityHelper mainActivityHelper, StorageReference storageReference) {
+    public PostRepository(Context context, FragmentAddPostBinding fragmentAddPostBinding, MainActivityHelper mainActivityHelper) {
         this.context = context;
         this.mainActivityHelper = mainActivityHelper;
         this.fragmentAddPostBinding = fragmentAddPostBinding;
-        this.storageReference = storageReference;
+        this.storageReference = FirebaseStorage.getInstance().getReference();
 
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.firebaseFirestore = FirebaseFirestore.getInstance();
@@ -92,7 +92,7 @@ public class PostRepository implements IPostRepository {
 
     @Override
     public void add(long categoryId, Post post) {
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -218,7 +218,7 @@ public class PostRepository implements IPostRepository {
         progressDialogDelete.show();
 
         String email = firebaseAuth.getCurrentUser().getEmail();
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(email);
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -314,10 +314,10 @@ public class PostRepository implements IPostRepository {
     }
 
     @Override
-    public void listAll() {
+    public void listAllForGallery() {
         String userEmail = firebaseAuth.getCurrentUser().getEmail();
 
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(userEmail);
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(userEmail);
         documentReference.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -351,6 +351,11 @@ public class PostRepository implements IPostRepository {
                         Log.d("Tag", e.getLocalizedMessage());
                     }
                 });
+    }
+
+    @Override
+    public void listAllForUser() {
+
     }
 }
 

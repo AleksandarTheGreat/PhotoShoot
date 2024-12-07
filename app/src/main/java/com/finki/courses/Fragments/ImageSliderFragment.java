@@ -41,7 +41,7 @@ public class ImageSliderFragment extends Fragment implements IEssentials {
         this.mainActivityHelper = mainActivityHelper;
         this.listOfMaps = listOfMaps;
         this.currentImagePosition = currentImagePosition;
-        toaster = new Toaster(getContext());
+        this.toaster = new Toaster(getContext());
     }
 
     @Override

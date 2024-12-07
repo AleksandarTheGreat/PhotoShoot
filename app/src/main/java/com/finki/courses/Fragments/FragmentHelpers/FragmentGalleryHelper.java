@@ -40,7 +40,9 @@ public class FragmentGalleryHelper {
 
         int totalMargin = 8;
         int halfMargin = totalMargin / 2;
-        int imageSide = (width / 4) - totalMargin;
+        int columnCount = 4;
+
+        int imageSide = (width / columnCount) - totalMargin;
         Log.d("Tag", "Image side: " + imageSide);
 
         for (int i = 0; i < allPostsList.size(); i++) {

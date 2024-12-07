@@ -45,9 +45,6 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     private PostRepository postRepository;
     private MainActivityHelper mainActivityHelper;
 
-    private FirebaseStorage firebaseStorage;
-    private StorageReference storageReference;
-
     public FragmentAddPost() {
         // Required empty public constructor
     }
@@ -71,11 +68,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
 
     @Override
     public void instantiateObjects() {
-        firebaseStorage = FirebaseStorage.getInstance();
-        storageReference = firebaseStorage.getReference();
-
-        postRepository = new PostRepository(getContext(), binding, mainActivityHelper, storageReference);
-
+        postRepository = new PostRepository(getContext(), binding, mainActivityHelper);
         toaster = new Toaster(getContext());
     }
 

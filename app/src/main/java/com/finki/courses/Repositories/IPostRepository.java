@@ -10,5 +10,6 @@ public interface IPostRepository {
     void add(long categoryId, Post post);
     void uploadImage(Category category, InputStream inputStream);
     void deleteById(long categoryId, long postId);
-    void listAll();
+    void listAllForGallery();
+    void listAllForUser();
 }
