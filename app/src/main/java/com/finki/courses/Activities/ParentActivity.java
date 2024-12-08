@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.finki.courses.Utils.ThemeUtils;
+import com.google.android.material.color.DynamicColors;
 
 public abstract class ParentActivity extends AppCompatActivity {
 

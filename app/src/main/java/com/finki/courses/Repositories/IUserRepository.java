@@ -6,7 +6,7 @@ import java.io.InputStream;
 
 public interface IUserRepository {
 
-    void loadProfilePicture();
+    void loadProfilePictureFromFirebase();
     void addUserPictureToDocument(String email, String profilePictureUri);
     void uploadUserPictureToStorage(InputStream inputStream);
 

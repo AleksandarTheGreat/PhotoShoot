@@ -20,9 +20,9 @@ import com.finki.courses.databinding.ActivityMainBinding;
 
 public class MainActivityHelper {
 
-    private Context context;
-    private ActivityMainBinding binding;
-    private AppCompatActivity appCompatActivity;
+    private final Context context;
+    private final ActivityMainBinding binding;
+    private final AppCompatActivity appCompatActivity;
 
     public MainActivityHelper(Context context, AppCompatActivity appCompatActivity, ActivityMainBinding binding) {
         this.context = context;

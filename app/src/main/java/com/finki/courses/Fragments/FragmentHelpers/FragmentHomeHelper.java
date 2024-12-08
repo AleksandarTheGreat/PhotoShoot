@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
@@ -38,6 +39,7 @@ import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -226,6 +228,7 @@ public class FragmentHomeHelper {
         return relativeLayoutHeader;
     }
 
+    @SuppressLint("SetTextI18n")
     private LinearLayout buildAnEmptyUILayoutForCategory(Category category) {
         LinearLayout.LayoutParams layoutParamsLinearLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsLinearLayout.setMargins(48, 0, 48, 64);
@@ -240,7 +243,7 @@ public class FragmentHomeHelper {
         layoutParamsImageView.setMargins(0, 0, 0, 48);
 
         ImageView imageView = new ImageView(context);
-        imageView.setImageResource(R.mipmap.ic_launcher);
+        imageView.setImageResource(R.drawable.ic_post);
         imageView.setLayoutParams(layoutParamsImageView);
 
 
@@ -256,17 +259,21 @@ public class FragmentHomeHelper {
         LinearLayout.LayoutParams layoutParamsButton = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsButton.setMargins(0, 0, 0, 24);
 
-        Button button = new Button(context);
-        button.setText("Create a post");
-        button.setOnClickListener(view -> {
+        int primaryColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, Color.BLUE);
+        TextView textViewButton = new TextView(context);
+        textViewButton.setTextColor(primaryColor);
+        textViewButton.setPadding(4,4,4,4);
+        textViewButton.setTextSize(16);
+        textViewButton.setText("Create a post +");
+        textViewButton.setOnClickListener(view -> {
             mainActivityHelper.changeFragments(new FragmentAddPost(category, mainActivityHelper), true);
         });
-        button.setLayoutParams(layoutParamsButton);
+        textViewButton.setLayoutParams(layoutParamsButton);
 
 
         linearLayout.addView(imageView);
         linearLayout.addView(textViewNoPostsYet);
-        linearLayout.addView(button);
+        linearLayout.addView(textViewButton);
 
         return linearLayout;
     }

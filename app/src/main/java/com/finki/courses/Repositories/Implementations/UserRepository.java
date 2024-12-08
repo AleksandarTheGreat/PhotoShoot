@@ -51,7 +51,7 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public void loadProfilePicture() {
+    public void loadProfilePictureFromFirebase() {
         String email = firebaseAuth.getCurrentUser().getEmail();
 
         DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
@@ -65,6 +65,8 @@ public class UserRepository implements IUserRepository {
                         if (imageUrl.isEmpty()) return;
 
                         Picasso.get().load(imageUrl).into(fragmentUserBinding.imageViewUserPicture);
+                        // IF the picture has not been added to cache when uploaded
+                        // Some sort of a safety precaution
                         saveProfilePictureToCache(imageUrl, email + " sharedPreferences");
                         Log.d("Tag", "Loaded profile picture from firebase");
                     }
