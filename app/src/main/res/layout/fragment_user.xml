@@ -12,13 +12,21 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <ImageView
-            android:layout_height="100dp"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="100dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_height="100dp"
             android:layout_marginTop="48dp"
-            android:layout_marginBottom="24dp"
-            />
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/imageViewUserPicture"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="centerCrop"
+                />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:layout_height="wrap_content"
@@ -32,7 +40,15 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:text="Email goes here"
+            android:layout_marginBottom="8dp"
+            />
+
+        <Button
+            android:id="@+id/buttonSaveUser"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:layout_marginBottom="48dp"
+            android:text="Save"
             />
 
         <LinearLayout

@@ -1,7 +1,11 @@
 package com.finki.courses.Fragments;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -19,9 +23,16 @@ import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
 import com.finki.courses.Repositories.Implementations.AuthenticationRepository;
 import com.finki.courses.Repositories.Implementations.PostRepository;
+import com.finki.courses.Repositories.Implementations.UserRepository;
 import com.finki.courses.databinding.FragmentUserBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import kotlin.Result;
 
 
 public class FragmentUser extends Fragment implements IEssentials {
@@ -34,6 +45,11 @@ public class FragmentUser extends Fragment implements IEssentials {
 
     private FragmentUserHelper fragmentUserHelper;
     private PostRepository postRepository;
+
+    private static int USER_IMAGE_REQ_CODE = 2;
+    private static Uri profileImageUri;
+    private UserRepository userRepository;
+
 
     public FragmentUser() {}
     public FragmentUser(MainActivityHelper mainActivityHelper){
@@ -64,6 +80,15 @@ public class FragmentUser extends Fragment implements IEssentials {
 
         postRepository = new PostRepository(getContext());
         postRepository.listAllForUser(fragmentUserHelper);
+
+        String email = firebaseAuth.getCurrentUser().getEmail();
+        userRepository = new UserRepository(getContext(), binding);
+        if (userRepository.profileCacheIsEmpty(email + " sharedPreferences")){
+            userRepository.loadProfilePicture();
+        } else {
+            userRepository.loadProfilePictureFromCache(email + " sharedPreferences");
+        }
+
     }
 
     @Override
@@ -75,11 +100,53 @@ public class FragmentUser extends Fragment implements IEssentials {
         binding.buttonICanFixThat.setOnClickListener(view -> {
             mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
         });
+
+        binding.imageViewUserPicture.setOnClickListener(view -> {
+            Intent openGallery = new Intent(Intent.ACTION_PICK);
+            openGallery.setType("image/*");
+            startActivityForResult(openGallery, USER_IMAGE_REQ_CODE);
+        });
+
+        binding.buttonSaveUser.setOnClickListener(view -> {
+            if (profileImageUri == null){
+                toaster.text("Pick a profile image first");
+                return;
+            }
+
+            try {
+
+                InputStream inputStream = getContext().getContentResolver().openInputStream(profileImageUri);
+                if (inputStream != null){
+                    userRepository.uploadUserPictureToStorage(inputStream);
+                } else {
+                    toaster.text("Failed to open inputStream");
+                }
+
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
     public void additionalThemeChanges() {
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == USER_IMAGE_REQ_CODE && resultCode == Activity.RESULT_OK && data != null){
+            profileImageUri = data.getData();
+            Picasso.get().load(profileImageUri).into(binding.imageViewUserPicture);
+            toaster.text("Successfully pulled image uri: '" + profileImageUri.toString() + "'");
+        } else {
+            toaster.text("Not pulled anything");
+        }
+    }
+
+    public static void clearUserImageUri(){
+        profileImageUri = null;
     }
 }
 
