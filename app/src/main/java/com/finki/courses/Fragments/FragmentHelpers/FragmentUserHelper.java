@@ -39,8 +39,8 @@ public class FragmentUserHelper {
         fragmentUserBinding.gridLayoutPostsUserFragment.setVisibility(View.VISIBLE);
 
 
-        fragmentUserBinding.textViewTotalCategories.setText("Categories  " + cateogryList.size());
-        fragmentUserBinding.textViewTotalPosts.setText("Posts  " + postList.size());
+        fragmentUserBinding.textViewTotalCategories.setText(String.valueOf(cateogryList.size()));
+        fragmentUserBinding.textViewTotalPosts.setText(String.valueOf(postList.size()));
 
         int windowWidth = context.getResources().getDisplayMetrics().widthPixels;
         int windowHeight = context.getResources().getDisplayMetrics().heightPixels;

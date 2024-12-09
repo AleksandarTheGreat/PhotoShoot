@@ -2,6 +2,7 @@ package com.finki.courses.Fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -25,6 +26,7 @@ import com.finki.courses.Repositories.Implementations.AuthenticationRepository;
 import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Repositories.Implementations.UserRepository;
 import com.finki.courses.databinding.FragmentUserBinding;
+import com.google.android.material.color.MaterialColors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
@@ -131,7 +133,8 @@ public class FragmentUser extends Fragment implements IEssentials {
 
     @Override
     public void additionalThemeChanges() {
-
+        int primaryColor = MaterialColors.getColor(getContext(), com.google.android.material.R.attr.colorPrimary, Color.BLUE);
+        binding.textViewEmail.setTextColor(primaryColor);
     }
 
     @Override
@@ -144,6 +147,12 @@ public class FragmentUser extends Fragment implements IEssentials {
         } else {
             toaster.text("Not pulled anything");
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        clearUserImageUri();
     }
 
     public static void clearUserImageUri(){

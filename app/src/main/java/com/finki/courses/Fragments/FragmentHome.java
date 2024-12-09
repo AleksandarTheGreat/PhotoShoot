@@ -104,7 +104,7 @@ public class FragmentHome extends Fragment implements IEssentials {
         } else {
             binding.imageViewLogo.setImageResource(R.drawable.ic_logo_finki_black);
             binding.textViewTitle.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
-            binding.textViewEmptyList.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
+            binding.textViewEmptyList.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
         }
     }
 }
