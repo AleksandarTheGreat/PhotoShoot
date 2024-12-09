@@ -69,6 +69,7 @@ public class FragmentHomeHelper {
     private CategoryRepository categoryRepository;
     private PostRepository postRepository;
     private Toaster toaster;
+    private boolean isNightModeOn;
 
     public FragmentHomeHelper(Context context, FragmentHomeBinding binding, MainActivityHelper mainActivityHelper) {
         this.context = context;
@@ -78,6 +79,8 @@ public class FragmentHomeHelper {
         this.postRepository = new PostRepository(context, mainActivityHelper);
         this.categoryRepository = new CategoryRepository(context, binding, this);
         this.toaster = new Toaster(context);
+
+        this.isNightModeOn = ThemeUtils.isNightModeOn(context);
     }
 
     public void showCategoryInputDialog() {
@@ -156,6 +159,12 @@ public class FragmentHomeHelper {
         textViewCategoryTitle.setText(category.getName());
         textViewCategoryTitle.setLayoutParams(layoutParamsTextViewName);
 
+        if (isNightModeOn){
+            textViewCategoryTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
+        } else {
+            textViewCategoryTitle.setTextColor(ContextCompat.getColor(context, R.color.black));
+        }
+
 
         RelativeLayout.LayoutParams layoutParamsTextViewSize = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsTextViewSize.setMargins(0,24,0,0);
@@ -168,27 +177,14 @@ public class FragmentHomeHelper {
 
 
 
-        // Icon add post
-        RelativeLayout.LayoutParams layoutParamsImageIcon2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsImageIcon2.setMargins(8, 0, 8, 0);
-        layoutParamsImageIcon2.addRule(RelativeLayout.ALIGN_PARENT_END);
-        layoutParamsImageIcon2.addRule(RelativeLayout.CENTER_VERTICAL);
-
-        ImageView imageViewIconAddPost = new ImageView(context);
-        imageViewIconAddPost.setId(View.generateViewId());
-        imageViewIconAddPost.setLayoutParams(layoutParamsImageIcon2);
-        imageViewIconAddPost.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentAddPost(category, mainActivityHelper), true);
-        });
-
-
         // Icon delete category
-        RelativeLayout.LayoutParams layoutParamsImageIcon3 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsImageIcon3.setMargins(8, 0, 8, 0);
-        layoutParamsImageIcon3.addRule(RelativeLayout.LEFT_OF, imageViewIconAddPost.getId());
+        RelativeLayout.LayoutParams layoutParamsImageIcon3 = new RelativeLayout.LayoutParams(64, 64);
+        layoutParamsImageIcon3.setMargins(12, 0, 8, 0);
+        layoutParamsImageIcon3.addRule(RelativeLayout.ALIGN_PARENT_END);
         layoutParamsImageIcon3.addRule(RelativeLayout.CENTER_VERTICAL);
 
         ImageView imageViewIconDelete = new ImageView(context);
+        imageViewIconDelete.setImageResource(R.drawable.ic_close_red);
         imageViewIconDelete.setId(View.generateViewId());
         imageViewIconDelete.setLayoutParams(layoutParamsImageIcon3);
         imageViewIconDelete.setOnClickListener(view -> {
@@ -212,16 +208,23 @@ public class FragmentHomeHelper {
         });
 
 
-        if (ThemeUtils.isNightModeOn(context)) {
-            imageViewIconAddPost.setImageResource(R.drawable.ic_add_night);
-            imageViewIconDelete.setImageResource(R.drawable.ic_delete_night);
-        } else {
-            imageViewIconAddPost.setImageResource(R.drawable.ic_add_day);
-            imageViewIconDelete.setImageResource(R.drawable.ic_delete_day);
-        }
+        // Icon add post
+        RelativeLayout.LayoutParams layoutParamsImageIcon2 = new RelativeLayout.LayoutParams(64, 64);
+        layoutParamsImageIcon2.setMargins(8, 0, 12, 0);
+        layoutParamsImageIcon2.addRule(RelativeLayout.LEFT_OF, imageViewIconDelete.getId());
+        layoutParamsImageIcon2.addRule(RelativeLayout.CENTER_VERTICAL);
 
-        relativeLayoutHeader.addView(imageViewIconAddPost);
+        ImageView imageViewIconAddPost = new ImageView(context);
+        imageViewIconAddPost.setImageResource(R.drawable.ic_add_green);
+        imageViewIconAddPost.setId(View.generateViewId());
+        imageViewIconAddPost.setLayoutParams(layoutParamsImageIcon2);
+        imageViewIconAddPost.setOnClickListener(view -> {
+            mainActivityHelper.changeFragments(new FragmentAddPost(category, mainActivityHelper), true);
+        });
+
+
         relativeLayoutHeader.addView(imageViewIconDelete);
+        relativeLayoutHeader.addView(imageViewIconAddPost);
         relativeLayoutHeader.addView(textViewCategoryTitle);
         relativeLayoutHeader.addView(textViewSize);
 
@@ -237,10 +240,13 @@ public class FragmentHomeHelper {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setGravity(Gravity.CENTER);
         linearLayout.setLayoutParams(layoutParamsLinearLayout);
+        linearLayout.setOnClickListener(view -> {
+            mainActivityHelper.changeFragments(new FragmentAddPost(category, mainActivityHelper), true);
+        });
 
 
         LinearLayout.LayoutParams layoutParamsImageView = new LinearLayout.LayoutParams(250, 250);
-        layoutParamsImageView.setMargins(0, 0, 0, 48);
+        layoutParamsImageView.setMargins(0, 0, 0, 24);
 
         ImageView imageView = new ImageView(context);
         imageView.setImageResource(R.drawable.ic_post);
@@ -248,7 +254,7 @@ public class FragmentHomeHelper {
 
 
         LinearLayout.LayoutParams layoutParamsTextView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsTextView.setMargins(0, 0, 0, 24);
+        layoutParamsTextView.setMargins(0, 0, 0, 12);
 
         TextView textViewNoPostsYet = new TextView(context);
         textViewNoPostsYet.setText("Sadly, you have no posts yet");
@@ -264,10 +270,8 @@ public class FragmentHomeHelper {
         textViewButton.setTextColor(primaryColor);
         textViewButton.setPadding(4,4,4,4);
         textViewButton.setTextSize(16);
+        textViewButton.setTypeface(Typeface.DEFAULT_BOLD);
         textViewButton.setText("Create a post +");
-        textViewButton.setOnClickListener(view -> {
-            mainActivityHelper.changeFragments(new FragmentAddPost(category, mainActivityHelper), true);
-        });
         textViewButton.setLayoutParams(layoutParamsButton);
 
 

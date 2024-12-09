@@ -99,7 +99,7 @@ public class PostRepository implements IPostRepository {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         // If I can add a post, the document must exist first
-                        // there fore this cannot be null nor empty ?
+                        // therefore this cannot be null nor empty ?
 
                         Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
                         List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");

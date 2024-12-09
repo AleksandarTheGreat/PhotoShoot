@@ -101,11 +101,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
 
     @Override
     public void additionalThemeChanges() {
-        if (ThemeUtils.isNightModeOn(getContext())) {
-            binding.imageViewAdd.setImageResource(R.drawable.ic_add_night);
-        } else {
-            binding.imageViewAdd.setImageResource(R.drawable.ic_add_day);
-        }
+
     }
 
     @Override

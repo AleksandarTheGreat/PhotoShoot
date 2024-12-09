@@ -17,7 +17,7 @@
             android:layout_height="40dp"
             android:layout_marginStart="12dp"
             android:layout_marginVertical="12dp"
-            android:src="@drawable/ic_logo_finki"
+            android:src="@mipmap/ic_launcher"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -36,15 +36,23 @@
             app:layout_constraintBottom_toBottomOf="@id/imageViewLogo"
             />
 
-        <SearchView
-            android:id="@+id/searchBarFragmentHome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginEnd="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imageViewProfileFragmentHome"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="centerCrop"
+                />
+
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -81,6 +89,7 @@
             />
 
         <TextView
+            android:id="@+id/textViewEmptyList"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textSize="22sp"

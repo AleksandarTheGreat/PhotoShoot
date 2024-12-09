@@ -10,7 +10,7 @@ public interface IUserRepository {
     void addUserPictureToDocument(String email, String profilePictureUri);
     void uploadUserPictureToStorage(InputStream inputStream);
 
-    void loadProfilePictureFromCache(String sharedPrefName);
+    String loadProfilePictureFromCache(String sharedPrefName);
     void saveProfilePictureToCache(String imageUrl, String sharedPrefName);
     boolean profileCacheIsEmpty(String sharedPrefName);
 }

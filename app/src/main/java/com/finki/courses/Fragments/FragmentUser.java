@@ -83,10 +83,11 @@ public class FragmentUser extends Fragment implements IEssentials {
 
         String email = firebaseAuth.getCurrentUser().getEmail();
         userRepository = new UserRepository(getContext(), binding);
-        if (userRepository.profileCacheIsEmpty(email + " sharedPreferences")){
+        if (userRepository.profileCacheIsEmpty(email)){
             userRepository.loadProfilePictureFromFirebase();
         } else {
-            userRepository.loadProfilePictureFromCache(email + " sharedPreferences");
+            String profileUrl = userRepository.loadProfilePictureFromCache(email);
+            Picasso.get().load(profileUrl).into(binding.imageViewUserPicture);
         }
 
     }
