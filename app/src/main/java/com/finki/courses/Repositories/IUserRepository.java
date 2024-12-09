@@ -13,4 +13,9 @@ public interface IUserRepository {
     String loadProfilePictureFromCache(String sharedPrefName);
     void saveProfilePictureToCache(String imageUrl, String sharedPrefName);
     boolean profileCacheIsEmpty(String sharedPrefName);
+
+
+
+    void loadCoverPhotoFromFirebase();
+    void uploadAndAddCoverPhotoToDocument(String email, InputStream inputStream);
 }

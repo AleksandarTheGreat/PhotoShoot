@@ -63,6 +63,7 @@ public class FragmentGallery extends Fragment implements IEssentials {
     public void addEventListeners() {
         binding.buttonICanFixThat.setOnClickListener(view -> {
             mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
+            mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemHome);
         });
     }
 

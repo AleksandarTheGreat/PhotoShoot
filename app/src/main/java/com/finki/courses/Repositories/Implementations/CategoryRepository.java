@@ -192,7 +192,8 @@ public class CategoryRepository implements ICategoriesRepository {
                             categoryList.add(categoryMap);
 
                             Map<String, Object> userMap = new HashMap<>();
-                            userMap.put("imageUrl", "");
+                            userMap.put("profilePhotoUrl", "");
+                            userMap.put("coverPhotoUrl", "");
                             userMap.put("categoryList", categoryList);
 
                             Map<String, Object> finalMap = new HashMap<>();

@@ -327,6 +327,8 @@ public class PostRepository implements IPostRepository {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             Map<String,Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
 
+                            if (userMap == null) return;
+
                             List<Map<String, Object>> allPostsList = new ArrayList<>();
                             List<Map<String, Object>> categoryList = (List<Map<String, Object>>) userMap.get("categoryList");
 
@@ -366,6 +368,8 @@ public class PostRepository implements IPostRepository {
                         if (task.isSuccessful()){
                             DocumentSnapshot documentSnapshot = task.getResult();
                             Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
+
+                            if (userMap == null) return;
 
                             List<Map<String, Object>> allPosts = new ArrayList<>();
                             List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) userMap.get("categoryList");

@@ -31,13 +31,13 @@ import java.util.Map;
 public class UserRepository implements IUserRepository {
 
     private static final String COLLECTION_NAME = "Users";
-    private static final String PROFILE_SHARED_PREF = "PROFILE_SHARED_PREF";
     private Context context;
     private Toaster toaster;
     private FirebaseStorage firebaseStorage;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
-    private ProgressDialog progressDialog;
+    private ProgressDialog progressDialogProfilePicture;
+    private ProgressDialog progressDialogCoverPicture;
     private FragmentUserBinding fragmentUserBinding;
 
     // Used in FragmentHome for the profile picture
@@ -56,6 +56,11 @@ public class UserRepository implements IUserRepository {
         this.firebaseAuth = FirebaseAuth.getInstance();
     }
 
+    /**
+     * Profile picture CRUD
+     * or parts of it are done here
+     */
+
     @Override
     public void loadProfilePictureFromFirebase() {
         String email = firebaseAuth.getCurrentUser().getEmail();
@@ -67,7 +72,7 @@ public class UserRepository implements IUserRepository {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
 
-                        String imageUrl = String.valueOf(map.get("imageUrl"));
+                        String imageUrl = String.valueOf(map.get("profilePhotoUrl"));
                         if (imageUrl.isEmpty()) return;
 
                         Picasso.get().load(imageUrl).into(fragmentUserBinding.imageViewUserPicture);
@@ -88,17 +93,18 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public void uploadUserPictureToStorage(InputStream inputStream) {
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Uploading profile picture");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        progressDialogProfilePicture = new ProgressDialog(context);
+        progressDialogProfilePicture.setTitle("Uploading profile picture");
+        progressDialogProfilePicture.setCancelable(false);
+        progressDialogProfilePicture.show();
 
         String email = firebaseAuth.getCurrentUser().getEmail();
 
-        String fileName = System.currentTimeMillis() + ".jpg";
+        String imageName = System.currentTimeMillis() + ".jpg";
+        String fileName = "/" + email + "/profilePictures/" + imageName;
 
         StorageReference storageReference = firebaseStorage.getReference();
-        StorageReference imageFile = storageReference.child("/" + email + "/profilePictures/" + fileName);
+        StorageReference imageFile = storageReference.child(fileName);
 
         UploadTask uploadTask = (UploadTask) imageFile.putStream(inputStream)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -116,16 +122,16 @@ public class UserRepository implements IUserRepository {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             toaster.text(e.getLocalizedMessage());
-                                            progressDialog.dismiss();
+                                            progressDialogProfilePicture.dismiss();
                                             fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                                            FragmentUser.clearUserImageUri();
+                                            FragmentUser.clearProfilePictureUrl();
                                         }
                                     });
                         } else {
                             toaster.text("Failed to upload image");
-                            progressDialog.dismiss();
+                            progressDialogProfilePicture.dismiss();
                             fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                            FragmentUser.clearUserImageUri();
+                            FragmentUser.clearProfilePictureUrl();
                         }
                     }
                 })
@@ -134,9 +140,9 @@ public class UserRepository implements IUserRepository {
                     public void onFailure(@NonNull Exception e) {
                         toaster.text(e.getLocalizedMessage());
                         Log.d("Tag", e.getLocalizedMessage());
-                        progressDialog.dismiss();
+                        progressDialogProfilePicture.dismiss();
                         fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                        FragmentUser.clearUserImageUri();
+                        FragmentUser.clearProfilePictureUrl();
                     }
                 });
 
@@ -151,14 +157,14 @@ public class UserRepository implements IUserRepository {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
 
-                        userMap.put("imageUrl", profilePictureUri);
+                        userMap.put("profilePhotoUrl", profilePictureUri);
                         documentReference.update("user", userMap)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         toaster.text("Uploaded profile picture successfully");
-                                        progressDialog.dismiss();
-                                        FragmentUser.clearUserImageUri();
+                                        progressDialogProfilePicture.dismiss();
+                                        FragmentUser.clearProfilePictureUrl();
 
                                         // Add to cache always on upload
                                         Log.d("Tag", "Saved profile picture to firebase");
@@ -170,9 +176,9 @@ public class UserRepository implements IUserRepository {
                                     public void onFailure(@NonNull Exception e) {
                                         toaster.text(e.getLocalizedMessage());
                                         Log.d("Tag", e.getLocalizedMessage());
-                                        progressDialog.dismiss();
+                                        progressDialogProfilePicture.dismiss();
                                         fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                                        FragmentUser.clearUserImageUri();
+                                        FragmentUser.clearProfilePictureUrl();
                                     }
                                 });
                     }
@@ -182,9 +188,9 @@ public class UserRepository implements IUserRepository {
                     public void onFailure(@NonNull Exception e) {
                         toaster.text(e.getLocalizedMessage());
                         Log.d("Tag", e.getLocalizedMessage());
-                        progressDialog.dismiss();
+                        progressDialogProfilePicture.dismiss();
                         fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                        FragmentUser.clearUserImageUri();
+                        FragmentUser.clearProfilePictureUrl();
                     }
                 });
     }
@@ -192,7 +198,7 @@ public class UserRepository implements IUserRepository {
     @Override
     public String loadProfilePictureFromCache(String sharedPrefName) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        String imageUrl = sharedPreferences.getString("imageUrl", "");
+        String imageUrl = sharedPreferences.getString("profilePhotoUrl", "");
 
         Log.d("Tag", "User image loaded from shared pref '" + sharedPrefName + "'");
         return imageUrl;
@@ -203,7 +209,7 @@ public class UserRepository implements IUserRepository {
         SharedPreferences sharedPreferences = context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putString("imageUrl", imageUrl);
+        editor.putString("profilePhotoUrl", imageUrl);
         editor.apply();
 
         Log.d("Tag", "User image saved to shared pref '" + sharedPrefName + "'");
@@ -212,9 +218,142 @@ public class UserRepository implements IUserRepository {
     @Override
     public boolean profileCacheIsEmpty(String sharedPrefName) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE);
-        String imageUrl = sharedPreferences.getString("imageUrl", "");
+        String imageUrl = sharedPreferences.getString("profilePhotoUrl", "");
 
         return imageUrl.isEmpty();
+    }
+
+
+    /**
+     * Cover Photo CRUD
+     * or parts of it are done here
+     */
+
+    @Override
+    public void loadCoverPhotoFromFirebase() {
+        String email = firebaseAuth.getCurrentUser().getEmail();
+
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
+        documentReference.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
+                        String coverPhotoUrl = String.valueOf(userMap.get("coverPhotoUrl"));
+
+                        if (coverPhotoUrl.isEmpty()) return;
+
+                        Picasso.get().load(coverPhotoUrl).into(fragmentUserBinding.imageViewCoverPhoto);
+                        Log.d("Tag", "Loaded cover picture from firebase");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        toaster.text(e.getLocalizedMessage());
+                        Log.d("Tag", e.getLocalizedMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void uploadAndAddCoverPhotoToDocument(String email, InputStream inputStream) {
+        progressDialogCoverPicture = new ProgressDialog(context);
+        progressDialogCoverPicture.setTitle("Uploading cover picture");
+        progressDialogCoverPicture.setCancelable(false);
+        progressDialogCoverPicture.show();
+
+        String imageName = System.currentTimeMillis() + ".jpg";
+        String fileName = "/" + email + "/coverPictures/" + imageName;
+
+        StorageReference storageReference = firebaseStorage.getReference();
+        StorageReference imageRef = storageReference.child(fileName);
+
+        UploadTask uploadTask = (UploadTask) imageRef.putStream(inputStream)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        if (taskSnapshot.getTask().isSuccessful()){
+                            imageRef.getDownloadUrl()
+                                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            String coverImageUri = String.valueOf(uri);
+
+                                            // SECOND PART
+                                            // ADDITION TO DOCUMENT
+                                            // STARTS HERE
+
+                                            DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
+                                            documentReference.get()
+                                                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                            Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
+                                                            userMap.put("coverPhotoUrl", coverImageUri);
+
+                                                            documentReference.update("user", userMap)
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void unused) {
+                                                                            toaster.text("Uploaded cover picture successfully");
+                                                                            progressDialogCoverPicture.dismiss();
+                                                                            FragmentUser.clearCoverPictureUrl();
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.d("Tag", e.getLocalizedMessage());
+                                                                            toaster.text(e.getLocalizedMessage());
+                                                                            progressDialogCoverPicture.dismiss();
+                                                                            FragmentUser.clearCoverPictureUrl();
+                                                                            fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                                                                        }
+                                                                    });
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.d("Tag", e.getLocalizedMessage());
+                                                            toaster.text(e.getLocalizedMessage());
+                                                            progressDialogCoverPicture.dismiss();
+                                                            FragmentUser.clearCoverPictureUrl();
+                                                            fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                                                        }
+                                                    });
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            toaster.text(e.getLocalizedMessage());
+                                            Log.d("Tag", e.getLocalizedMessage());
+                                            progressDialogCoverPicture.dismiss();
+                                            FragmentUser.clearCoverPictureUrl();
+                                            fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                                        }
+                                    });
+
+                        } else {
+                            toaster.text("Failed to upload cover image");
+                            progressDialogCoverPicture.dismiss();
+                            FragmentUser.clearCoverPictureUrl();
+                            fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        toaster.text(e.getLocalizedMessage());
+                        Log.d("Tag", e.getLocalizedMessage());
+                        progressDialogCoverPicture.dismiss();
+                        FragmentUser.clearCoverPictureUrl();
+                        fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                    }
+                });
     }
 
 }

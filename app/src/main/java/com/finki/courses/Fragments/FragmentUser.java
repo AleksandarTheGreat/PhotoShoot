@@ -48,8 +48,10 @@ public class FragmentUser extends Fragment implements IEssentials {
     private FragmentUserHelper fragmentUserHelper;
     private PostRepository postRepository;
 
-    private static int USER_IMAGE_REQ_CODE = 2;
-    private static Uri profileImageUri;
+    private static int PROFILE_PIC_REQ_CODE = 2;
+    private static int COVER_PIC_REQ_CODE = 3;
+    private static Uri profilePhotoUrl;
+    private static Uri coverPhotoUrl;
     private UserRepository userRepository;
 
 
@@ -85,6 +87,8 @@ public class FragmentUser extends Fragment implements IEssentials {
 
         String email = firebaseAuth.getCurrentUser().getEmail();
         userRepository = new UserRepository(getContext(), binding);
+        userRepository.loadCoverPhotoFromFirebase();
+
         if (userRepository.profileCacheIsEmpty(email)){
             userRepository.loadProfilePictureFromFirebase();
         } else {
@@ -102,29 +106,58 @@ public class FragmentUser extends Fragment implements IEssentials {
 
         binding.buttonICanFixThat.setOnClickListener(view -> {
             mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
+            mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemHome);
         });
+
+
 
         binding.imageViewUserPicture.setOnClickListener(view -> {
             Intent openGallery = new Intent(Intent.ACTION_PICK);
             openGallery.setType("image/*");
-            startActivityForResult(openGallery, USER_IMAGE_REQ_CODE);
+            startActivityForResult(openGallery, PROFILE_PIC_REQ_CODE);
         });
 
-        binding.buttonSaveUser.setOnClickListener(view -> {
-            if (profileImageUri == null){
+        binding.buttonSaveUserProfile.setOnClickListener(view -> {
+            if (profilePhotoUrl == null){
                 toaster.text("Pick a profile image first");
                 return;
             }
 
             try {
-
-                InputStream inputStream = getContext().getContentResolver().openInputStream(profileImageUri);
+                InputStream inputStream = getContext().getContentResolver().openInputStream(profilePhotoUrl);
                 if (inputStream != null){
                     userRepository.uploadUserPictureToStorage(inputStream);
                 } else {
                     toaster.text("Failed to open inputStream");
                 }
 
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
+
+        binding.imageViewCoverPhoto.setOnClickListener(view -> {
+            Intent openGallery = new Intent(Intent.ACTION_PICK);
+            openGallery.setType("image/*");
+            startActivityForResult(openGallery, COVER_PIC_REQ_CODE);
+        });
+
+        binding.buttonSaveUserCover.setOnClickListener(view -> {
+            if (coverPhotoUrl == null){
+                toaster.text("Pick a cover photo first");
+                return;
+            }
+
+            try {
+                InputStream inputStream = getContext().getContentResolver().openInputStream(coverPhotoUrl);
+                if (inputStream != null){
+                    String email = firebaseAuth.getCurrentUser().getEmail();
+                    userRepository.uploadAndAddCoverPhotoToDocument(email, inputStream);
+                } else {
+                    toaster.text("Failed to open inputStream");
+                }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -140,23 +173,32 @@ public class FragmentUser extends Fragment implements IEssentials {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == USER_IMAGE_REQ_CODE && resultCode == Activity.RESULT_OK && data != null){
-            profileImageUri = data.getData();
-            Picasso.get().load(profileImageUri).into(binding.imageViewUserPicture);
-            toaster.text("Successfully pulled image uri: '" + profileImageUri.toString() + "'");
-        } else {
-            toaster.text("Not pulled anything");
+        if (requestCode == PROFILE_PIC_REQ_CODE && resultCode == Activity.RESULT_OK && data != null){
+            profilePhotoUrl = data.getData();
+            Picasso.get().load(profilePhotoUrl).into(binding.imageViewUserPicture);
+            toaster.text("Successfully pulled profile uri: '" + profilePhotoUrl.toString() + "'");
+        }
+
+        if (requestCode == COVER_PIC_REQ_CODE && resultCode == Activity.RESULT_OK && data != null){
+            coverPhotoUrl = data.getData();
+            Picasso.get().load(coverPhotoUrl).into(binding.imageViewCoverPhoto);
+            toaster.text("Successfully pulled cover uri: '" + coverPhotoUrl.toString() + "'");
         }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        clearUserImageUri();
+        clearProfilePictureUrl();
+        clearCoverPictureUrl();
     }
 
-    public static void clearUserImageUri(){
-        profileImageUri = null;
+    public static void clearProfilePictureUrl(){
+        profilePhotoUrl = null;
+    }
+
+    public static void clearCoverPictureUrl(){
+        coverPhotoUrl = null;
     }
 }
 

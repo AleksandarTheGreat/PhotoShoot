@@ -9,32 +9,36 @@ import java.util.List;
 public class User {
 
     private String email;
-    private String imageUrl;
+    private String profilePhotoUrl;
+    private String coverPhotoUrl;
 
     private List<Category> categoryList;
     public User(){}
-    public User(String email, String imageUrl, List<Category> categoryList){
+    public User(String email, String profilePhotoUrl, String coverPhotoUrl, List<Category> categoryList){
         this.email = email;
-        this.imageUrl = imageUrl;
+        this.profilePhotoUrl = profilePhotoUrl;
+        this.coverPhotoUrl = coverPhotoUrl;
         this.categoryList = categoryList;
     }
 
-    public User(String email, String imageUrl) {
+    public User(String email, String profilePhotoUrl, String coverPhotoUrl) {
         this.email = email;
-        this.imageUrl = imageUrl;
+        this.profilePhotoUrl = profilePhotoUrl;
+        this.coverPhotoUrl = coverPhotoUrl;
         this.categoryList = new ArrayList<>();
     }
 
     public User(String email){
         this.email = email;
-        this.imageUrl = "";
+        this.profilePhotoUrl = "";
+        this.coverPhotoUrl = "";
         this.categoryList = new ArrayList<>();
     }
 
     @NonNull
     @Override
     public String toString() {
-        return String.format("%s %s %s", email, imageUrl, categoryList.toString());
+        return String.format("%s %s", email, categoryList.toString());
     }
 
     public String getEmail() {
@@ -45,12 +49,12 @@ public class User {
         this.email = email;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getProfilePhotoUrl() {
+        return profilePhotoUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public String getCoverPhotoUrl() {
+        return coverPhotoUrl;
     }
 
     public List<Category> getCategoryList() {
