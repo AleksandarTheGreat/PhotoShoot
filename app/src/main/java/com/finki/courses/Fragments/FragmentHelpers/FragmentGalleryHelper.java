@@ -2,6 +2,7 @@ package com.finki.courses.Fragments.FragmentHelpers;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.GridLayout;
@@ -16,6 +17,10 @@ import com.finki.courses.R;
 import com.finki.courses.databinding.FragmentGalleryBinding;
 import com.squareup.picasso.Picasso;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +61,26 @@ public class FragmentGalleryHelper {
         int imageSide = (width / columnCount) - totalMargin;
         Log.d("Tag", "Image side: " + imageSide);
 
+        Map<String, List<Map<String, Object>>> datePostsMappingsMap = new HashMap<>();
+
         for (int i = 0; i < allPostsList.size(); i++) {
             Map<String, Object> postMap = allPostsList.get(i);
+            Map<String, Object> postedAtMap = (Map<String, Object>) postMap.get("postedAt");
+
+            long dayOfMonth = (long) postedAtMap.get("dayOfMonth");
+            String dayOfWeek = (String) postedAtMap.get("dayOfWeek");
+            String month = (String) postedAtMap.get("month");
+            long year = (long) postedAtMap.get("year");
+
+            Log.d("Tag", String.format("%s, %d %s %d", dayOfWeek,  dayOfMonth, month, year));
+            String wholeDate = dayOfWeek + " " + dayOfMonth + " " + month + " " + year;
+
+            if (!datePostsMappingsMap.containsKey(wholeDate))
+                datePostsMappingsMap.put(wholeDate, new ArrayList<>());
+            datePostsMappingsMap.get(wholeDate).add(postedAtMap);
+
+
+
 
             LinearLayout.LayoutParams layoutParamsImage = new LinearLayout.LayoutParams(imageSide, imageSide);
             layoutParamsImage.setMargins(halfMargin, halfMargin, halfMargin, halfMargin);
@@ -74,6 +97,9 @@ public class FragmentGalleryHelper {
             });
 
             fragmentGalleryBinding.gridLayout.addView(imageView);
+
+            Log.d("Tag", datePostsMappingsMap.toString());
+            toaster.text(datePostsMappingsMap.toString());
         }
     }
 
