@@ -65,20 +65,11 @@ public class FragmentGalleryHelper {
 
         for (int i = 0; i < allPostsList.size(); i++) {
             Map<String, Object> postMap = allPostsList.get(i);
-            Map<String, Object> postedAtMap = (Map<String, Object>) postMap.get("postedAt");
-
-            long dayOfMonth = (long) postedAtMap.get("dayOfMonth");
-            String dayOfWeek = (String) postedAtMap.get("dayOfWeek");
-            String month = (String) postedAtMap.get("month");
-            long year = (long) postedAtMap.get("year");
-
-            Log.d("Tag", String.format("%s, %d %s %d", dayOfWeek,  dayOfMonth, month, year));
-            String wholeDate = dayOfWeek + " " + dayOfMonth + " " + month + " " + year;
+            String wholeDate = calculateDateFromPost(postMap);
 
             if (!datePostsMappingsMap.containsKey(wholeDate))
                 datePostsMappingsMap.put(wholeDate, new ArrayList<>());
-            datePostsMappingsMap.get(wholeDate).add(postedAtMap);
-
+            datePostsMappingsMap.get(wholeDate).add(postMap);
 
 
 
@@ -101,6 +92,18 @@ public class FragmentGalleryHelper {
             Log.d("Tag", datePostsMappingsMap.toString());
             toaster.text(datePostsMappingsMap.toString());
         }
+    }
+
+    private String calculateDateFromPost(Map<String, Object> postMap){
+        Map<String, Object> postedAtMap = (Map<String, Object>) postMap.get("postedAt");
+
+        long dayOfMonth = (long) postedAtMap.get("dayOfMonth");
+        String dayOfWeek = (String) postedAtMap.get("dayOfWeek");
+        String month = (String) postedAtMap.get("month");
+        long year = (long) postedAtMap.get("year");
+
+        Log.d("Tag", String.format("%s, %d %s %d", dayOfWeek,  dayOfMonth, month, year));
+        return dayOfWeek + " " + dayOfMonth + " " + month + " " + year;
     }
 
 }
