@@ -1,6 +1,7 @@
 package com.finki.courses.Fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -100,12 +101,11 @@ public class FragmentUser extends Fragment implements IEssentials {
             String profileUrl = userRepository.loadProfilePictureFromCache(email);
             Picasso.get().load(profileUrl).into(binding.imageViewUserPicture);
         }
-
     }
 
     @Override
     public void addEventListeners() {
-        binding.buttonSignOut.setOnClickListener(view -> {
+        binding.imageViewSignOut.setOnClickListener(view -> {
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
             builder.setTitle("Sign out")
                     .setMessage("Are you sure you want to sign out ?")
@@ -139,71 +139,74 @@ public class FragmentUser extends Fragment implements IEssentials {
             startActivityForResult(openGallery, PROFILE_PIC_REQ_CODE);
         });
 
-        binding.buttonSaveUserProfile.setOnClickListener(view -> {
-            if (profilePhotoUrl == null) {
-                toaster.text("Pick a profile image first");
-                return;
-            }
-
-            try {
-                InputStream inputStream = getContext().getContentResolver().openInputStream(profilePhotoUrl);
-                if (inputStream != null) {
-                    userRepository.uploadUserPictureToStorage(inputStream);
-                } else {
-                    toaster.text("Failed to open inputStream");
-                }
-
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-
         binding.imageViewCoverPhoto.setOnClickListener(view -> {
             Intent openGallery = new Intent(Intent.ACTION_PICK);
             openGallery.setType("image/*");
             startActivityForResult(openGallery, COVER_PIC_REQ_CODE);
         });
 
-        binding.buttonSaveUserCover.setOnClickListener(view -> {
-            if (coverPhotoUrl == null) {
-                toaster.text("Pick a cover photo first");
-                return;
-            }
-
-            try {
-                InputStream inputStream = getContext().getContentResolver().openInputStream(coverPhotoUrl);
-                if (inputStream != null) {
-                    String email = firebaseAuth.getCurrentUser().getEmail();
-                    userRepository.uploadAndAddCoverPhotoToDocument(email, inputStream);
-                } else {
-                    toaster.text("Failed to open inputStream");
-                }
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     @Override
     public void additionalThemeChanges() {
-        int primaryColor = MaterialColors.getColor(getContext(), com.google.android.material.R.attr.colorPrimary, Color.BLUE);
-        binding.textViewEmail.setTextColor(primaryColor);
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == PROFILE_PIC_REQ_CODE && resultCode == Activity.RESULT_OK && data != null) {
             profilePhotoUrl = data.getData();
             Picasso.get().load(profilePhotoUrl).into(binding.imageViewUserPicture);
-            toaster.text("Successfully pulled profile uri: '" + profilePhotoUrl.toString() + "'");
+
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+            builder.setTitle("Change profile picture")
+                    .setMessage("Are you sure you want to change your profile picture?")
+                    .setPositiveButton("Yes, I am", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            saveProfilePicture();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            userRepository.loadProfilePictureFromFirebase();
+                            clearProfilePictureUrl();
+                            toaster.text("That's what I thought");
+                            dialog.dismiss();
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
         }
 
         if (requestCode == COVER_PIC_REQ_CODE && resultCode == Activity.RESULT_OK && data != null) {
             coverPhotoUrl = data.getData();
             Picasso.get().load(coverPhotoUrl).into(binding.imageViewCoverPhoto);
             toaster.text("Successfully pulled cover uri: '" + coverPhotoUrl.toString() + "'");
+
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+            builder.setTitle("Change cover photo")
+                    .setMessage("Are you sure you want to change your cover picture?")
+                    .setPositiveButton("Yes, I am", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            saveCoverPicture();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            userRepository.loadCoverPhotoFromFirebase();
+                            clearCoverPictureUrl();
+                            toaster.text("That's what I thought");
+                            dialog.dismiss();
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
         }
     }
 
@@ -220,6 +223,44 @@ public class FragmentUser extends Fragment implements IEssentials {
 
     public static void clearCoverPictureUrl() {
         coverPhotoUrl = null;
+    }
+
+    private void saveProfilePicture(){
+        if (profilePhotoUrl == null) {
+            toaster.text("Pick a profile image first");
+            return;
+        }
+
+        try {
+            InputStream inputStream = getContext().getContentResolver().openInputStream(profilePhotoUrl);
+            if (inputStream != null) {
+                userRepository.uploadUserPictureToStorage(inputStream);
+            } else {
+                toaster.text("Failed to open inputStream");
+            }
+
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void saveCoverPicture(){
+        if (coverPhotoUrl == null) {
+            toaster.text("Pick a cover photo first");
+            return;
+        }
+
+        try {
+            InputStream inputStream = getContext().getContentResolver().openInputStream(coverPhotoUrl);
+            if (inputStream != null) {
+                String email = firebaseAuth.getCurrentUser().getEmail();
+                userRepository.uploadAndAddCoverPhotoToDocument(email, inputStream);
+            } else {
+                toaster.text("Failed to open inputStream");
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
