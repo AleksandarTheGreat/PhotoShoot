@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
+import com.finki.courses.Fragments.ImageSliderFragment;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
 import com.finki.courses.databinding.FragmentUserBinding;
@@ -29,7 +31,7 @@ public class FragmentUserHelper {
     }
 
     @SuppressLint("SetTextI18n")
-    public void buildImages(List<Map<String,Object>> cateogryList, List<Map<String, Object>> postList){
+    public void buildImages(MainActivityHelper mainActivityHelper, List<Map<String,Object>> cateogryList, List<Map<String, Object>> postList){
         if (postList.isEmpty()){
             fragmentUserBinding.linearLayoutEmptyUserFragment.setVisibility(View.VISIBLE);
             fragmentUserBinding.gridLayoutPostsUserFragment.setVisibility(View.GONE);
@@ -62,11 +64,13 @@ public class FragmentUserHelper {
             Picasso.get().load(imageUri).into(imageView);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setLayoutParams(layoutParams);
+            int finalI = i;
             imageView.setOnClickListener(view -> {
                 int width = view.getWidth();
                 int height = view.getHeight();
 
                 toaster.text("Width: " + width + ", Height: " + height);
+                mainActivityHelper.changeFragments(new ImageSliderFragment(mainActivityHelper, postList, finalI), true);
             });
 
             fragmentUserBinding.gridLayoutPostsUserFragment.addView(imageView);

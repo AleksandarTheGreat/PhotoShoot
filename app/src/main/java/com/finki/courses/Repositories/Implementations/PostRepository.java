@@ -61,6 +61,7 @@ public class PostRepository implements IPostRepository {
         this.context = context;
         this.firebaseFirestore = FirebaseFirestore.getInstance();
         this.firebaseAuth = FirebaseAuth.getInstance();
+
         this.storageReference = FirebaseStorage.getInstance().getReference();
         this.toaster = new Toaster(context);
         this.mainActivityHelper = mainActivityHelper;
@@ -173,6 +174,7 @@ public class PostRepository implements IPostRepository {
 
         progressDialog.setTitle("Uploading...");
         progressDialog.setCancelable(false);
+
         progressDialog.show();
 
         StorageReference imageRef = storageReference.child(fileName);
@@ -381,7 +383,7 @@ public class PostRepository implements IPostRepository {
                                 }
                             }
 
-                            fragmentUserHelper.buildImages(listOfCategories, allPosts);
+                            fragmentUserHelper.buildImages(mainActivityHelper, listOfCategories, allPosts);
 
                         } else {
                             toaster.text("Failed to retrieve document with email '" + email + "'");

@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.finki.courses.R;
 import com.finki.courses.Repositories.Implementations.AuthenticationRepository;
+import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends ParentActivity {

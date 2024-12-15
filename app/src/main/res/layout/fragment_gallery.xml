@@ -6,19 +6,10 @@
     tools:context=".Fragments.FragmentGallery">
 
     <LinearLayout
+        android:id="@+id/mainLinearLayoutGalleryFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <GridLayout
-            android:id="@+id/gridLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:columnCount="4"
-            android:visibility="gone">
-
-        </GridLayout>
 
         <LinearLayout
             android:id="@+id/linearLayoutEmptyGalleryFragment"

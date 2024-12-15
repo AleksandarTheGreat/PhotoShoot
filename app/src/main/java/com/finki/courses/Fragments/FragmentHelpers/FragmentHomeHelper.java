@@ -157,13 +157,9 @@ public class FragmentHomeHelper {
         textViewCategoryTitle.setTextSize(20);
         textViewCategoryTitle.setTypeface(Typeface.DEFAULT_BOLD);
         textViewCategoryTitle.setText(category.getName());
+        textViewCategoryTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
         textViewCategoryTitle.setLayoutParams(layoutParamsTextViewName);
 
-        if (isNightModeOn){
-            textViewCategoryTitle.setTextColor(ContextCompat.getColor(context, R.color.white));
-        } else {
-            textViewCategoryTitle.setTextColor(ContextCompat.getColor(context, R.color.black));
-        }
 
 
         RelativeLayout.LayoutParams layoutParamsTextViewSize = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -316,6 +312,7 @@ public class FragmentHomeHelper {
 
             MaterialCardView materialCardView = new MaterialCardView(context);
             materialCardView.setLayoutParams(layoutParamsMaterialCardView);
+            materialCardView.setRadius(0);
             materialCardView.setClickable(true);
             materialCardView.setCheckable(true);
             materialCardView.setFocusable(true);

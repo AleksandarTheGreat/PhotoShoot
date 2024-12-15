@@ -1,6 +1,7 @@
 package com.finki.courses.Fragments;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -27,6 +28,8 @@ import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Repositories.Implementations.UserRepository;
 import com.finki.courses.databinding.FragmentUserBinding;
 import com.google.android.material.color.MaterialColors;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.dialog.MaterialDialogs;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
@@ -55,8 +58,10 @@ public class FragmentUser extends Fragment implements IEssentials {
     private UserRepository userRepository;
 
 
-    public FragmentUser() {}
-    public FragmentUser(MainActivityHelper mainActivityHelper){
+    public FragmentUser() {
+    }
+
+    public FragmentUser(MainActivityHelper mainActivityHelper) {
         this.mainActivityHelper = mainActivityHelper;
     }
 
@@ -75,21 +80,21 @@ public class FragmentUser extends Fragment implements IEssentials {
     public void instantiateObjects() {
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
-        binding.textViewEmail.setText(user != null? user.getEmail(): "");
+        binding.textViewEmail.setText(user != null ? user.getEmail() : "");
 
         authenticationRepository = new AuthenticationRepository(getContext());
         toaster = new Toaster(getContext());
 
         fragmentUserHelper = new FragmentUserHelper(getContext(), binding);
 
-        postRepository = new PostRepository(getContext());
+        postRepository = new PostRepository(getContext(), mainActivityHelper);
         postRepository.listAllForUser(fragmentUserHelper);
 
         String email = firebaseAuth.getCurrentUser().getEmail();
         userRepository = new UserRepository(getContext(), binding);
         userRepository.loadCoverPhotoFromFirebase();
 
-        if (userRepository.profileCacheIsEmpty(email)){
+        if (userRepository.profileCacheIsEmpty(email)) {
             userRepository.loadProfilePictureFromFirebase();
         } else {
             String profileUrl = userRepository.loadProfilePictureFromCache(email);
@@ -101,14 +106,31 @@ public class FragmentUser extends Fragment implements IEssentials {
     @Override
     public void addEventListeners() {
         binding.buttonSignOut.setOnClickListener(view -> {
-            authenticationRepository.signOutUser();
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+            builder.setTitle("Sign out")
+                    .setMessage("Are you sure you want to sign out ?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            authenticationRepository.signOutUser();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            toaster.text("That's what I thought");
+                            dialog.dismiss();
+                        }
+                    })
+                    .setCancelable(true)
+                    .show();
+
         });
 
         binding.buttonICanFixThat.setOnClickListener(view -> {
             mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
             mainActivityHelper.getBinding().bottomNavigationView.setSelectedItemId(R.id.itemHome);
         });
-
 
 
         binding.imageViewUserPicture.setOnClickListener(view -> {
@@ -118,14 +140,14 @@ public class FragmentUser extends Fragment implements IEssentials {
         });
 
         binding.buttonSaveUserProfile.setOnClickListener(view -> {
-            if (profilePhotoUrl == null){
+            if (profilePhotoUrl == null) {
                 toaster.text("Pick a profile image first");
                 return;
             }
 
             try {
                 InputStream inputStream = getContext().getContentResolver().openInputStream(profilePhotoUrl);
-                if (inputStream != null){
+                if (inputStream != null) {
                     userRepository.uploadUserPictureToStorage(inputStream);
                 } else {
                     toaster.text("Failed to open inputStream");
@@ -137,7 +159,6 @@ public class FragmentUser extends Fragment implements IEssentials {
         });
 
 
-
         binding.imageViewCoverPhoto.setOnClickListener(view -> {
             Intent openGallery = new Intent(Intent.ACTION_PICK);
             openGallery.setType("image/*");
@@ -145,14 +166,14 @@ public class FragmentUser extends Fragment implements IEssentials {
         });
 
         binding.buttonSaveUserCover.setOnClickListener(view -> {
-            if (coverPhotoUrl == null){
+            if (coverPhotoUrl == null) {
                 toaster.text("Pick a cover photo first");
                 return;
             }
 
             try {
                 InputStream inputStream = getContext().getContentResolver().openInputStream(coverPhotoUrl);
-                if (inputStream != null){
+                if (inputStream != null) {
                     String email = firebaseAuth.getCurrentUser().getEmail();
                     userRepository.uploadAndAddCoverPhotoToDocument(email, inputStream);
                 } else {
@@ -173,13 +194,13 @@ public class FragmentUser extends Fragment implements IEssentials {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PROFILE_PIC_REQ_CODE && resultCode == Activity.RESULT_OK && data != null){
+        if (requestCode == PROFILE_PIC_REQ_CODE && resultCode == Activity.RESULT_OK && data != null) {
             profilePhotoUrl = data.getData();
             Picasso.get().load(profilePhotoUrl).into(binding.imageViewUserPicture);
             toaster.text("Successfully pulled profile uri: '" + profilePhotoUrl.toString() + "'");
         }
 
-        if (requestCode == COVER_PIC_REQ_CODE && resultCode == Activity.RESULT_OK && data != null){
+        if (requestCode == COVER_PIC_REQ_CODE && resultCode == Activity.RESULT_OK && data != null) {
             coverPhotoUrl = data.getData();
             Picasso.get().load(coverPhotoUrl).into(binding.imageViewCoverPhoto);
             toaster.text("Successfully pulled cover uri: '" + coverPhotoUrl.toString() + "'");
@@ -193,11 +214,11 @@ public class FragmentUser extends Fragment implements IEssentials {
         clearCoverPictureUrl();
     }
 
-    public static void clearProfilePictureUrl(){
+    public static void clearProfilePictureUrl() {
         profilePhotoUrl = null;
     }
 
-    public static void clearCoverPictureUrl(){
+    public static void clearCoverPictureUrl() {
         coverPhotoUrl = null;
     }
 }

@@ -4,11 +4,16 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
 
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.ImageSliderFragment;
@@ -23,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class FragmentGalleryHelper {
 
@@ -41,12 +47,10 @@ public class FragmentGalleryHelper {
     public void buildImages(List<Map<String, Object>> allPostsList) {
         if (allPostsList.isEmpty()){
             fragmentGalleryBinding.linearLayoutEmptyGalleryFragment.setVisibility(View.VISIBLE);
-            fragmentGalleryBinding.gridLayout.setVisibility(View.GONE);
             return;
         }
 
         fragmentGalleryBinding.linearLayoutEmptyGalleryFragment.setVisibility(View.GONE);
-        fragmentGalleryBinding.gridLayout.setVisibility(View.VISIBLE);
 
         int width = context.getResources().getDisplayMetrics().widthPixels;
         int height = context.getResources().getDisplayMetrics().heightPixels;
@@ -71,27 +75,54 @@ public class FragmentGalleryHelper {
                 datePostsMappingsMap.put(wholeDate, new ArrayList<>());
             datePostsMappingsMap.get(wholeDate).add(postMap);
 
-
-
-            LinearLayout.LayoutParams layoutParamsImage = new LinearLayout.LayoutParams(imageSide, imageSide);
-            layoutParamsImage.setMargins(halfMargin, halfMargin, halfMargin, halfMargin);
-
-            Uri imageUri = Uri.parse(String.valueOf(postMap.get("imageUrl")));
-
-            ImageView imageView = new ImageView(context);
-            Picasso.get().load(imageUri).into(imageView);
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setLayoutParams(layoutParamsImage);
-            int finalI = i;
-            imageView.setOnClickListener(view -> {
-                mainActivityHelper.changeFragments(new ImageSliderFragment(mainActivityHelper, allPostsList, finalI), true);
-            });
-
-            fragmentGalleryBinding.gridLayout.addView(imageView);
-
             Log.d("Tag", datePostsMappingsMap.toString());
-            toaster.text(datePostsMappingsMap.toString());
         }
+
+        datePostsMappingsMap.forEach(new BiConsumer<String, List<Map<String, Object>>>() {
+            @Override
+            public void accept(String s, List<Map<String, Object>> maps) {
+                LinearLayout.LayoutParams layoutParamsTextViewTitle = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParamsTextViewTitle.setMargins(24,24,24,16);
+
+                TextView textViewDate = new TextView(context);
+                textViewDate.setText(s);
+                textViewDate.setLayoutParams(layoutParamsTextViewTitle);
+                textViewDate.setTextSize(16);
+                textViewDate.setTextColor(ContextCompat.getColor(context, R.color.white));
+
+
+                LinearLayout.LayoutParams layoutParamsGridLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParamsGridLayout.setMargins(halfMargin,0,halfMargin,48);
+                layoutParamsGridLayout.gravity = Gravity.START;
+
+                GridLayout gridLayout = new GridLayout(context);
+                gridLayout.setColumnCount(4);
+                gridLayout.setLayoutParams(layoutParamsGridLayout);
+
+                for (int i=0;i<maps.size();i++){
+                    Map<String, Object> postMap = maps.get(i);
+
+                    LinearLayout.LayoutParams layoutParamsImage = new LinearLayout.LayoutParams(imageSide, imageSide);
+                    layoutParamsImage.setMargins(halfMargin, halfMargin, halfMargin, halfMargin);
+
+                    Uri imageUri = Uri.parse(String.valueOf(postMap.get("imageUrl")));
+
+                    ImageView imageView = new ImageView(context);
+                    Picasso.get().load(imageUri).into(imageView);
+                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    imageView.setLayoutParams(layoutParamsImage);
+                    int finalI = i;
+                    imageView.setOnClickListener(view -> {
+                        mainActivityHelper.changeFragments(new ImageSliderFragment(mainActivityHelper, maps, finalI), true);
+                    });
+
+                    gridLayout.addView(imageView);
+                }
+
+                fragmentGalleryBinding.mainLinearLayoutGalleryFragment.addView(textViewDate);
+                fragmentGalleryBinding.mainLinearLayoutGalleryFragment.addView(gridLayout);
+            }
+        });
     }
 
     private String calculateDateFromPost(Map<String, Object> postMap){

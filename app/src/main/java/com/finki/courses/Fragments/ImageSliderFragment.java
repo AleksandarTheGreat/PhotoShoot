@@ -1,5 +1,6 @@
 package com.finki.courses.Fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -8,6 +9,7 @@ import androidx.core.view.WindowCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -65,6 +67,7 @@ public class ImageSliderFragment extends Fragment implements IEssentials {
         hideSystemBarsAndNavigationView();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void addEventListeners() {
         binding.viewPager2FragmentImageSlider.setOnClickListener(view -> {

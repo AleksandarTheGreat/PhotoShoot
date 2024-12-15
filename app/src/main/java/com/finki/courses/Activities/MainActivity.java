@@ -1,10 +1,12 @@
 package com.finki.courses.Activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import com.finki.courses.Fragments.FragmentUser;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
+import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
