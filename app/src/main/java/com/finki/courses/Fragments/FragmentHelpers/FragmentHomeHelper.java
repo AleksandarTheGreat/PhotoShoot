@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
@@ -230,7 +231,7 @@ public class FragmentHomeHelper {
     @SuppressLint("SetTextI18n")
     private LinearLayout buildAnEmptyUILayoutForCategory(Category category) {
         LinearLayout.LayoutParams layoutParamsLinearLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsLinearLayout.setMargins(48, 0, 48, 64);
+        layoutParamsLinearLayout.setMargins(48, 32, 48, 64);
 
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -314,7 +315,6 @@ public class FragmentHomeHelper {
             materialCardView.setLayoutParams(layoutParamsMaterialCardView);
             materialCardView.setRadius(0);
             materialCardView.setClickable(true);
-            materialCardView.setCheckable(true);
             materialCardView.setFocusable(true);
             int finalI = i;
             materialCardView.setOnClickListener(view -> {
@@ -355,9 +355,9 @@ public class FragmentHomeHelper {
             layoutParamsForImageView.setMargins(0, 0, 0, 0);
 
             ImageView imageViewPost = new ImageView(context);
-            if (postMap.get("imageUrl").equals("")) {
+            if (postMap.get("imageUrl").equals(""))
                 imageViewPost.setImageResource(0);
-            } else
+            else
                 Picasso.get().load(imageUri).into(imageViewPost);
             imageViewPost.setLayoutParams(layoutParamsForImageView);
             imageViewPost.setScaleType(ImageView.ScaleType.CENTER_CROP);

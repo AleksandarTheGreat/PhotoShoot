@@ -146,6 +146,9 @@ public class PostRepository implements IPostRepository {
                                     });
                         } else {
                             toaster.text("Category not found");
+                            fragmentAddPostBinding.imageViewAdd.setVisibility(View.VISIBLE);
+                            fragmentAddPostBinding.imageViewPickedImage.setImageResource(0);
+                            FragmentAddPost.clearImageUri();
                             progressDialog.dismiss();
                         }
                     }
@@ -174,7 +177,6 @@ public class PostRepository implements IPostRepository {
 
         progressDialog.setTitle("Uploading...");
         progressDialog.setCancelable(false);
-
         progressDialog.show();
 
         StorageReference imageRef = storageReference.child(fileName);
@@ -199,6 +201,7 @@ public class PostRepository implements IPostRepository {
                                         toaster.text(e.getMessage());
                                         Log.d("Tag", e.getLocalizedMessage());
                                         progressDialog.dismiss();
+                                        FragmentAddPost.clearImageUri();
                                     }
                                 });
                     }
@@ -209,6 +212,7 @@ public class PostRepository implements IPostRepository {
                         toaster.text(e.getMessage());
                         Log.d("Tag", e.getLocalizedMessage());
                         progressDialog.dismiss();
+                        FragmentAddPost.clearImageUri();
                     }
                 });
     }

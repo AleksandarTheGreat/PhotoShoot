@@ -122,16 +122,12 @@ public class UserRepository implements IUserRepository {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             toaster.text(e.getLocalizedMessage());
-                                            progressDialogProfilePicture.dismiss();
-                                            fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                                            FragmentUser.clearProfilePictureUrl();
+                                            clearForProfilePicture();
                                         }
                                     });
                         } else {
                             toaster.text("Failed to upload image");
-                            progressDialogProfilePicture.dismiss();
-                            fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                            FragmentUser.clearProfilePictureUrl();
+                            clearForProfilePicture();
                         }
                     }
                 })
@@ -140,9 +136,7 @@ public class UserRepository implements IUserRepository {
                     public void onFailure(@NonNull Exception e) {
                         toaster.text(e.getLocalizedMessage());
                         Log.d("Tag", e.getLocalizedMessage());
-                        progressDialogProfilePicture.dismiss();
-                        fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                        FragmentUser.clearProfilePictureUrl();
+                        clearForProfilePicture();
                     }
                 });
 
@@ -176,9 +170,7 @@ public class UserRepository implements IUserRepository {
                                     public void onFailure(@NonNull Exception e) {
                                         toaster.text(e.getLocalizedMessage());
                                         Log.d("Tag", e.getLocalizedMessage());
-                                        progressDialogProfilePicture.dismiss();
-                                        fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                                        FragmentUser.clearProfilePictureUrl();
+                                        clearForProfilePicture();
                                     }
                                 });
                     }
@@ -188,9 +180,7 @@ public class UserRepository implements IUserRepository {
                     public void onFailure(@NonNull Exception e) {
                         toaster.text(e.getLocalizedMessage());
                         Log.d("Tag", e.getLocalizedMessage());
-                        progressDialogProfilePicture.dismiss();
-                        fragmentUserBinding.imageViewUserPicture.setImageResource(0);
-                        FragmentUser.clearProfilePictureUrl();
+                        clearForProfilePicture();
                     }
                 });
     }
@@ -306,9 +296,7 @@ public class UserRepository implements IUserRepository {
                                                                         public void onFailure(@NonNull Exception e) {
                                                                             Log.d("Tag", e.getLocalizedMessage());
                                                                             toaster.text(e.getLocalizedMessage());
-                                                                            progressDialogCoverPicture.dismiss();
-                                                                            FragmentUser.clearCoverPictureUrl();
-                                                                            fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                                                                            clearForCoverPicture();
                                                                         }
                                                                     });
                                                         }
@@ -318,9 +306,7 @@ public class UserRepository implements IUserRepository {
                                                         public void onFailure(@NonNull Exception e) {
                                                             Log.d("Tag", e.getLocalizedMessage());
                                                             toaster.text(e.getLocalizedMessage());
-                                                            progressDialogCoverPicture.dismiss();
-                                                            FragmentUser.clearCoverPictureUrl();
-                                                            fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                                                            clearForCoverPicture();
                                                         }
                                                     });
                                         }
@@ -330,17 +316,13 @@ public class UserRepository implements IUserRepository {
                                         public void onFailure(@NonNull Exception e) {
                                             toaster.text(e.getLocalizedMessage());
                                             Log.d("Tag", e.getLocalizedMessage());
-                                            progressDialogCoverPicture.dismiss();
-                                            FragmentUser.clearCoverPictureUrl();
-                                            fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                                            clearForCoverPicture();
                                         }
                                     });
 
                         } else {
                             toaster.text("Failed to upload cover image");
-                            progressDialogCoverPicture.dismiss();
-                            FragmentUser.clearCoverPictureUrl();
-                            fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                            clearForCoverPicture();
                         }
                     }
                 })
@@ -349,11 +331,22 @@ public class UserRepository implements IUserRepository {
                     public void onFailure(@NonNull Exception e) {
                         toaster.text(e.getLocalizedMessage());
                         Log.d("Tag", e.getLocalizedMessage());
-                        progressDialogCoverPicture.dismiss();
-                        FragmentUser.clearCoverPictureUrl();
-                        fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
+                        clearForCoverPicture();
                     }
                 });
+    }
+
+
+    private void clearForProfilePicture(){
+        progressDialogProfilePicture.dismiss();
+        fragmentUserBinding.imageViewUserPicture.setImageResource(0);
+        FragmentUser.clearProfilePictureUrl();
+    }
+
+    private void clearForCoverPicture(){
+        progressDialogCoverPicture.dismiss();
+        FragmentUser.clearCoverPictureUrl();
+        fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);
     }
 
 }

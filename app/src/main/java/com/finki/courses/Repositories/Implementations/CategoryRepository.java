@@ -182,6 +182,9 @@ public class CategoryRepository implements ICategoriesRepository {
                                         }
                                     });
                         } else {
+
+                            // This is in case the document has not been created when the user is created
+
                             long categoryId = UUID.randomUUID().getLeastSignificantBits() * -1;
                             Map<String, Object> categoryMap = new HashMap<>();
                             categoryMap.put("id", categoryId);
@@ -195,6 +198,7 @@ public class CategoryRepository implements ICategoriesRepository {
                             userMap.put("profilePhotoUrl", "");
                             userMap.put("coverPhotoUrl", "");
                             userMap.put("categoryList", categoryList);
+                            userMap.put("email", email);
 
                             Map<String, Object> finalMap = new HashMap<>();
                             finalMap.put("user", userMap);
@@ -238,6 +242,11 @@ public class CategoryRepository implements ICategoriesRepository {
                         for (Map<String, Object> map1 : listOfCategories) {
                             long cid = Long.parseLong(String.valueOf(map1.get("id")));
                             if (id == cid) {
+
+                                // Find the image file via the
+                                // map reference and delete it
+                                // Better done on a separate thread since it will take some time
+
                                 listOfCategories.remove(map1);
 
                                 map.put("categoryList", listOfCategories);

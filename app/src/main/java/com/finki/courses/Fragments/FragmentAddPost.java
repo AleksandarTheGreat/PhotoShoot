@@ -1,6 +1,7 @@
 package com.finki.courses.Fragments;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.FragmentAddPostBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -79,24 +81,6 @@ public class FragmentAddPost extends Fragment implements IEssentials {
             openGalleryIntent.setType("image/*");
             startActivityForResult(openGalleryIntent, REQ_CODE_GALLERY);
         });
-
-        binding.buttonSave.setOnClickListener(view -> {
-            if (pickedImageUri == null) {
-                toaster.text("Please pick an image first");
-                return;
-            }
-
-            try {
-                InputStream inputStream = getContext().getContentResolver().openInputStream(pickedImageUri);
-                if (inputStream != null) {
-                    postRepository.uploadImage(category, inputStream);
-                } else {
-                    toaster.text("Somehow the inputStream is null");
-                }
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     @Override
@@ -112,6 +96,27 @@ public class FragmentAddPost extends Fragment implements IEssentials {
 
             pickedImageUri = data.getData();
             Picasso.get().load(data.getData()).into(binding.imageViewPickedImage);
+
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+            builder.setTitle("Upload")
+                    .setMessage("To upload a picture click yes")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            uploadImageToFirebaseStorage();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            binding.imageViewAdd.setVisibility(View.VISIBLE);
+                            binding.imageViewPickedImage.setImageResource(0);
+                            clearImageUri();
+                            dialog.dismiss();
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
         }
     }
 
@@ -121,7 +126,25 @@ public class FragmentAddPost extends Fragment implements IEssentials {
         clearImageUri();
     }
 
-    public static void clearImageUri(){
+    public static void clearImageUri() {
         pickedImageUri = null;
+    }
+
+    private void uploadImageToFirebaseStorage() {
+        if (pickedImageUri == null) {
+            toaster.text("Please pick an image first");
+            return;
+        }
+
+        try {
+            InputStream inputStream = getContext().getContentResolver().openInputStream(pickedImageUri);
+            if (inputStream != null) {
+                postRepository.uploadImage(category, inputStream);
+            } else {
+                toaster.text("Somehow the inputStream is null");
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -48,7 +48,7 @@ public class AuthenticationRepository implements IAuthenticationRepository {
 
         binding.textLayoutEmail.setError("");
         if (!validatePassword(password)){
-            binding.textLayoutPassword.setError("Password is too short");
+            binding.textLayoutPassword.setError("Password needs to be at least 8 characters");
             return;
         }
 
