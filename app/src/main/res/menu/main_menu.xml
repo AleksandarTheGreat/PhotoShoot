@@ -10,13 +10,13 @@
     <item
         android:id="@+id/itemHome"
         android:title="HOME"
-        android:icon="@drawable/ic_category"
+        android:icon="@drawable/ic_home"
         />
 
     <item
         android:id="@+id/itemGallery"
         android:title="GALLERY"
-        android:icon="@drawable/ic_gallery"
+        android:icon="@drawable/ic_post"
         />
 
     <item
