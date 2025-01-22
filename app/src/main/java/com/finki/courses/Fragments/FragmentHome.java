@@ -97,11 +97,7 @@ public class FragmentHome extends Fragment implements IEssentials {
 
     @Override
     public void additionalThemeChanges() {
-        if (isNightModeOn){
-            binding.imageViewLogo.setImageResource(R.drawable.ic_logo_finki_white);
-            binding.textViewTitle.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-            binding.textViewEmptyList.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
-        }
+
     }
 }
 

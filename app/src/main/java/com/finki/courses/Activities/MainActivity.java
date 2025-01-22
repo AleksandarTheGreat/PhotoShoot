@@ -14,6 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.finki.courses.Fragments.FragmentFeed;
 import com.finki.courses.Fragments.FragmentGallery;
 import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Fragments.FragmentUser;
@@ -34,6 +35,7 @@ public class MainActivity extends ParentActivity {
     private FragmentHome fragmentHome;
     private FragmentUser fragmentUser;
     private FragmentGallery fragmentGallery;
+    private FragmentFeed fragementFeed;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -74,6 +76,7 @@ public class MainActivity extends ParentActivity {
         fragmentHome = new FragmentHome(mainActivityHelper);
         fragmentUser = new FragmentUser(mainActivityHelper);
         fragmentGallery = new FragmentGallery(mainActivityHelper);
+        fragementFeed = new FragmentFeed(mainActivityHelper);
 
         toaster = new Toaster(MainActivity.this);
 
@@ -96,6 +99,8 @@ public class MainActivity extends ParentActivity {
                     mainActivityHelper.changeFragments(fragmentUser, false);
                 } else if (item.getItemId() == R.id.itemGallery){
                     mainActivityHelper.changeFragments(fragmentGallery, false);
+                } else if (item.getItemId() == R.id.itemFeed){
+                    mainActivityHelper.changeFragments(fragementFeed, false);
                 }
                 return true;
             }

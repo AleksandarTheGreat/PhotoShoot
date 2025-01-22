@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.firestore.v1.Document;
 
 import java.util.ArrayList;
@@ -184,6 +186,8 @@ public class CategoryRepository implements ICategoriesRepository {
                         } else {
 
                             // This is in case the document has not been created when the user is created
+                            // This is more of a safety precaution rather than actually being used
+                            // Since with every user creation there is a document for that user being created
 
                             long categoryId = UUID.randomUUID().getLeastSignificantBits() * -1;
                             Map<String, Object> categoryMap = new HashMap<>();
@@ -239,16 +243,36 @@ public class CategoryRepository implements ICategoriesRepository {
                         Map<String, Object> map = (Map<String, Object>) documentSnapshot.get("user");
                         List<Map<String, Object>> listOfCategories = (List<Map<String, Object>>) map.get("categoryList");
 
-                        for (Map<String, Object> map1 : listOfCategories) {
-                            long cid = Long.parseLong(String.valueOf(map1.get("id")));
+                        for (Map<String, Object> categoryMap : listOfCategories) {
+                            long cid = Long.parseLong(String.valueOf(categoryMap.get("id")));
                             if (id == cid) {
 
-                                // Find the image file via the
-                                // map reference and delete it
-                                // Better done on a separate thread since it will take some time
+                                // Find the posts and delete all of the from storage
+                                List<Map<String, Object>> postList = (List<Map<String, Object>>) categoryMap.get("postList");
+                                for (Map<String, Object> postMap: postList){
+                                    long idd = (long) postMap.get("id");
+                                    String imageUrl = (String) postMap.get("imageUrl");
+                                    String name = (String) postMap.get("name");
 
-                                listOfCategories.remove(map1);
+                                    Log.d("Tag", "ID: " + idd + "\nImage url: " + imageUrl + "\nName: " + name);
+                                    StorageReference imageRef = FirebaseStorage.getInstance().getReference().child(name);
+                                    imageRef.delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    Log.d("Tag", "Successfully deleted image at location: '" + name + "'");
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d("Tag", e.getLocalizedMessage());
+                                                }
+                                            });
+                                }
 
+                                // Delete the document itself
+                                listOfCategories.remove(categoryMap);
                                 map.put("categoryList", listOfCategories);
                                 documentReference.update("user", map)
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {

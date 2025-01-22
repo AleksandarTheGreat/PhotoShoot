@@ -3,6 +3,7 @@ package com.finki.courses.Fragments.FragmentHelpers;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,15 +25,16 @@ public class FragmentUserHelper {
     private Context context;
     private FragmentUserBinding fragmentUserBinding;
     private Toaster toaster;
-    public FragmentUserHelper(Context context, FragmentUserBinding fragmentUserBinding){
+
+    public FragmentUserHelper(Context context, FragmentUserBinding fragmentUserBinding) {
         this.context = context;
         this.fragmentUserBinding = fragmentUserBinding;
         this.toaster = new Toaster(context);
     }
 
     @SuppressLint("SetTextI18n")
-    public void buildImages(MainActivityHelper mainActivityHelper, List<Map<String,Object>> cateogryList, List<Map<String, Object>> postList){
-        if (postList.isEmpty()){
+    public void buildImages(MainActivityHelper mainActivityHelper, List<Map<String, Object>> cateogryList, List<Map<String, Object>> postList) {
+        if (postList.isEmpty()) {
             fragmentUserBinding.linearLayoutEmptyUserFragment.setVisibility(View.VISIBLE);
             fragmentUserBinding.gridLayoutPostsUserFragment.setVisibility(View.GONE);
             return;
@@ -41,8 +43,8 @@ public class FragmentUserHelper {
         fragmentUserBinding.gridLayoutPostsUserFragment.setVisibility(View.VISIBLE);
 
 
-        fragmentUserBinding.textViewTotalCategories.setText(String.valueOf(cateogryList.size()));
-        fragmentUserBinding.textViewTotalPosts.setText(String.valueOf(postList.size()));
+        fragmentUserBinding.textViewTotalCategories.setText(cateogryList.size() + " categories.");
+        fragmentUserBinding.textViewTotalPosts.setText(postList.size() + " posts.");
 
         int windowWidth = context.getResources().getDisplayMetrics().widthPixels;
         int windowHeight = context.getResources().getDisplayMetrics().heightPixels;
@@ -53,7 +55,7 @@ public class FragmentUserHelper {
         int imageSide = (windowWidth / columnCount) - 8;
         int margin = 4;
 
-        for (int i=0;i<postList.size();i++){
+        for (int i = 0; i < postList.size(); i++) {
             Map<String, Object> postMap = postList.get(i);
             Uri imageUri = Uri.parse(String.valueOf(postMap.get("imageUrl")));
 

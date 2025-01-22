@@ -106,6 +106,7 @@ public class UserRepository implements IUserRepository {
         StorageReference storageReference = firebaseStorage.getReference();
         StorageReference imageFile = storageReference.child(fileName);
 
+
         UploadTask uploadTask = (UploadTask) imageFile.putStream(inputStream)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -258,6 +259,7 @@ public class UserRepository implements IUserRepository {
 
         StorageReference storageReference = firebaseStorage.getReference();
         StorageReference imageRef = storageReference.child(fileName);
+
 
         UploadTask uploadTask = (UploadTask) imageRef.putStream(inputStream)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

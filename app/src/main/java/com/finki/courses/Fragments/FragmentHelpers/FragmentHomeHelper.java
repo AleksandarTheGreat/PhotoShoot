@@ -181,7 +181,7 @@ public class FragmentHomeHelper {
         layoutParamsImageIcon3.addRule(RelativeLayout.CENTER_VERTICAL);
 
         ImageView imageViewIconDelete = new ImageView(context);
-        imageViewIconDelete.setImageResource(R.drawable.ic_close_red);
+        imageViewIconDelete.setImageResource(R.drawable.ic_delete_trash);
         imageViewIconDelete.setId(View.generateViewId());
         imageViewIconDelete.setLayoutParams(layoutParamsImageIcon3);
         imageViewIconDelete.setOnClickListener(view -> {
@@ -212,7 +212,7 @@ public class FragmentHomeHelper {
         layoutParamsImageIcon2.addRule(RelativeLayout.CENTER_VERTICAL);
 
         ImageView imageViewIconAddPost = new ImageView(context);
-        imageViewIconAddPost.setImageResource(R.drawable.ic_add_green);
+        imageViewIconAddPost.setImageResource(R.drawable.ic_add_blue);
         imageViewIconAddPost.setId(View.generateViewId());
         imageViewIconAddPost.setLayoutParams(layoutParamsImageIcon2);
         imageViewIconAddPost.setOnClickListener(view -> {
@@ -295,9 +295,6 @@ public class FragmentHomeHelper {
         linearLayout.setLayoutParams(layoutParamsLinearLayout);
 
         for (int i = 0; i < postList.size(); i++) {
-            // This represents a single post
-            // A post in firebase document is a map
-            // this is a map.
             Map<String, Object> postMap = (Map<String, Object>) postList.get(i);
             Uri imageUri = Uri.parse((String) postMap.get("imageUrl"));
 
@@ -305,7 +302,7 @@ public class FragmentHomeHelper {
 
             if (i == 0) {
                 layoutParamsMaterialCardView.setMargins(0, 0, 8, 0);
-            } else if (i == 5) {
+            } else if (i == postList.size() - 1) {
                 layoutParamsMaterialCardView.setMargins(8, 0, 0, 0);
             } else {
                 layoutParamsMaterialCardView.setMargins(8, 0, 8, 0);
