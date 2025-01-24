@@ -247,7 +247,8 @@ public class CategoryRepository implements ICategoriesRepository {
                             long cid = Long.parseLong(String.valueOf(categoryMap.get("id")));
                             if (id == cid) {
 
-                                // Find the posts and delete all of the from storage
+                                // Find the posts and delete all of them from storage
+
                                 List<Map<String, Object>> postList = (List<Map<String, Object>>) categoryMap.get("postList");
                                 for (Map<String, Object> postMap: postList){
                                     long idd = (long) postMap.get("id");

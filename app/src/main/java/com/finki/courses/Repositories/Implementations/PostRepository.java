@@ -180,7 +180,6 @@ public class PostRepository implements IPostRepository {
         progressDialog.show();
 
         StorageReference imageRef = storageReference.child(fileName);
-
         UploadTask uploadTask = (UploadTask) imageRef.putStream(inputStream)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override

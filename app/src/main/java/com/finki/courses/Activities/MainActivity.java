@@ -1,12 +1,9 @@
 package com.finki.courses.Activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -21,7 +18,6 @@ import com.finki.courses.Fragments.FragmentUser;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
-import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,7 +31,7 @@ public class MainActivity extends ParentActivity {
     private FragmentHome fragmentHome;
     private FragmentUser fragmentUser;
     private FragmentGallery fragmentGallery;
-    private FragmentFeed fragementFeed;
+    private FragmentFeed fragmentFeed;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -76,7 +72,7 @@ public class MainActivity extends ParentActivity {
         fragmentHome = new FragmentHome(mainActivityHelper);
         fragmentUser = new FragmentUser(mainActivityHelper);
         fragmentGallery = new FragmentGallery(mainActivityHelper);
-        fragementFeed = new FragmentFeed(mainActivityHelper);
+        fragmentFeed = new FragmentFeed(mainActivityHelper);
 
         toaster = new Toaster(MainActivity.this);
 
@@ -100,7 +96,7 @@ public class MainActivity extends ParentActivity {
                 } else if (item.getItemId() == R.id.itemGallery){
                     mainActivityHelper.changeFragments(fragmentGallery, false);
                 } else if (item.getItemId() == R.id.itemFeed){
-                    mainActivityHelper.changeFragments(fragementFeed, false);
+                    mainActivityHelper.changeFragments(fragmentFeed, false);
                 }
                 return true;
             }

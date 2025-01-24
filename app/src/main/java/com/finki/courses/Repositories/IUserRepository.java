@@ -16,4 +16,8 @@ public interface IUserRepository {
 
     void loadCoverPhotoFromFirebase();
     void uploadAndAddCoverPhotoToDocument(String email, InputStream inputStream);
+
+    void loadNicknameAndBioFromFirebase(String email);
+
+    void saveNicknameAndBioToFirebase(String email, String nickname, String bio);
 }

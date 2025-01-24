@@ -109,9 +109,8 @@ public class FragmentAddPost extends Fragment implements IEssentials {
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            binding.imageViewAdd.setVisibility(View.VISIBLE);
-                            binding.imageViewPickedImage.setImageResource(0);
                             clearImageUri();
+                            mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
                             dialog.dismiss();
                         }
                     })
@@ -148,3 +147,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
         }
     }
 }
+
+
+
+

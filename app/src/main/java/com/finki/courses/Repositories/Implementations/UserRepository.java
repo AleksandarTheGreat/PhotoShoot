@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -260,7 +261,6 @@ public class UserRepository implements IUserRepository {
         StorageReference storageReference = firebaseStorage.getReference();
         StorageReference imageRef = storageReference.child(fileName);
 
-
         UploadTask uploadTask = (UploadTask) imageRef.putStream(inputStream)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -334,6 +334,68 @@ public class UserRepository implements IUserRepository {
                         toaster.text(e.getLocalizedMessage());
                         Log.d("Tag", e.getLocalizedMessage());
                         clearForCoverPicture();
+                    }
+                });
+    }
+
+    @Override
+    public void loadNicknameAndBioFromFirebase(String email) {
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
+        documentReference.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
+
+                        String bio = (String) userMap.get("bio");
+                        String nickname = (String) userMap.get("nickname");
+
+                        fragmentUserBinding.textInputEditTextBio.setText(bio);
+                        fragmentUserBinding.textInputEditTextNickname.setText(nickname);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Tag", e.getLocalizedMessage());
+                        toaster.text(e.getLocalizedMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void saveNicknameAndBioToFirebase(String email, String nickname, String bio) {
+        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
+        documentReference.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        Map<String, Object> userMap = (Map<String, Object>) documentSnapshot.get("user");
+
+                        userMap.put("bio", bio);
+                        userMap.put("nickname", nickname);
+
+                        documentReference.update("user", userMap)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        toaster.text("Saved bio and nickname successfully");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d("Tag", e.getLocalizedMessage());
+                                        toaster.text(e.getLocalizedMessage());
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Tag", e.getLocalizedMessage());
+                        toaster.text(e.getLocalizedMessage());
                     }
                 });
     }

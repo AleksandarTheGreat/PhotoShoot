@@ -21,12 +21,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AuthenticationRepository implements IAuthenticationRepository {
 
-    private static final String COLLECTION_NAME = "Users";
+    private static final String COLLECTION_USERS = "Users";
+    private static final String COLLECTION_FEED_POSTS = "FeedPosts";
     private Context context;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -75,16 +78,34 @@ public class AuthenticationRepository implements IAuthenticationRepository {
                         userMap.put("user", user);
 
                         String documentName = firebaseUser.getEmail().toString();
-                        firebaseFirestore.collection(COLLECTION_NAME).document(documentName)
+                        firebaseFirestore.collection(COLLECTION_USERS).document(documentName)
                                 .set(userMap)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                        Intent intentGoToMainActivity = new Intent(context, MainActivity.class);
-                                        intentGoToMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        context.startActivity(intentGoToMainActivity);
 
-                                        Log.d("Tag", "Created document for user '" + firebaseUser.getEmail() + "' ");
+                                        Map<String, List<Map<String, Object>>> listMap = new HashMap<>();
+                                        listMap.put("list", new ArrayList<>());
+
+                                        firebaseFirestore.collection(COLLECTION_FEED_POSTS).document(documentName)
+                                                .set(listMap)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        Intent intentGoToMainActivity = new Intent(context, MainActivity.class);
+                                                        intentGoToMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                        context.startActivity(intentGoToMainActivity);
+
+                                                        Log.d("Tag", "Created 2 documents for user '" + firebaseUser.getEmail() + "' ");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.d("Tag", e.getLocalizedMessage());
+                                                        toaster.text(e.getLocalizedMessage());
+                                                    }
+                                                });
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

@@ -94,6 +94,7 @@ public class FragmentUser extends Fragment implements IEssentials {
         String email = firebaseAuth.getCurrentUser().getEmail();
         userRepository = new UserRepository(getContext(), binding);
         userRepository.loadCoverPhotoFromFirebase();
+        userRepository.loadNicknameAndBioFromFirebase(email);
 
         if (userRepository.profileCacheIsEmpty(email)) {
             userRepository.loadProfilePictureFromFirebase();
@@ -143,6 +144,15 @@ public class FragmentUser extends Fragment implements IEssentials {
             Intent openGallery = new Intent(Intent.ACTION_PICK);
             openGallery.setType("image/*");
             startActivityForResult(openGallery, COVER_PIC_REQ_CODE);
+        });
+
+        binding.buttonSaveNicknameAndBio.setOnClickListener(view -> {
+            String email = firebaseAuth.getCurrentUser().getEmail();
+
+            String nickname = binding.textInputEditTextNickname.getText().toString().trim();
+            String bio = binding.textInputEditTextBio.getText().toString().trim();
+
+            userRepository.saveNicknameAndBioToFirebase(email, nickname, bio);
         });
 
     }

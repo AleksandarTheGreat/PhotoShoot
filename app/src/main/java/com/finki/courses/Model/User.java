@@ -11,6 +11,8 @@ public class User {
     private String email;
     private String profilePhotoUrl;
     private String coverPhotoUrl;
+    private String nickname;
+    private String bio;
 
     private List<Category> categoryList;
     public User(){}
@@ -32,6 +34,8 @@ public class User {
         this.email = email;
         this.profilePhotoUrl = "";
         this.coverPhotoUrl = "";
+        this.nickname = "";
+        this.bio = "";
         this.categoryList = new ArrayList<>();
     }
 
@@ -65,4 +69,27 @@ public class User {
         this.categoryList = categoryList;
     }
 
+    public void setProfilePhotoUrl(String profilePhotoUrl) {
+        this.profilePhotoUrl = profilePhotoUrl;
+    }
+
+    public void setCoverPhotoUrl(String coverPhotoUrl) {
+        this.coverPhotoUrl = coverPhotoUrl;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 }
