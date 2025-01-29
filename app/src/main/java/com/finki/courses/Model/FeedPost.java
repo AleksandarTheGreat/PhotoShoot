@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,24 +20,28 @@ public class FeedPost {
     private String fileLocation;
     private Set<String> setLikes;
     private List<String> listComments;
+    private LocalDateTime postedAt;
 
     // This shall be used for uploading a single feed post
+    @SuppressLint("NewApi")
     public FeedPost(String email, String imageUrl) {
         this.id = UUID.randomUUID().getLeastSignificantBits() * -1;
         this.email = email;
         this.imageUrl = imageUrl;
         this.setLikes = new HashSet<>();
         this.listComments = new ArrayList<>();
+        this.postedAt = LocalDateTime.now();
     }
 
     // This shall be used when reading all feed posts
-    public FeedPost(long id, String email, String imageUrl, String fileLocation, Set<String> setLikes, List<String> listComments) {
+    public FeedPost(long id, String email, String imageUrl, String fileLocation, Set<String> setLikes, List<String> listComments, LocalDateTime postedAt) {
         this.id = id;
         this.email = email;
         this.imageUrl = imageUrl;
         this.fileLocation = fileLocation;
         this.setLikes = setLikes;
         this.listComments = listComments;
+        this.postedAt = postedAt;
     }
 
     @SuppressLint("DefaultLocale")
@@ -113,5 +118,13 @@ public class FeedPost {
 
     public void setFileLocation(String fileLocation) {
         this.fileLocation = fileLocation;
+    }
+
+    public LocalDateTime getPostedAt() {
+        return postedAt;
+    }
+
+    public void setPostedAt(LocalDateTime postedAt) {
+        this.postedAt = postedAt;
     }
 }

@@ -3,6 +3,8 @@ package com.finki.courses.Adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.ortiz.touchview.TouchImageView;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +92,11 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.MyView
             }
         });
 
+        myViewHolder.imageViewDownload.setOnClickListener(v -> {
+            FeedPost feedPost = feedPosts.get(myViewHolder.getAdapterPosition());
+            downloadImage(feedPost);
+        });
+
         return myViewHolder;
     }
 
@@ -120,6 +134,7 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.MyView
         protected TouchImageView touchImageViewPost;
         protected ImageView imageViewDelete;
         protected ImageView imageViewLike;
+        protected ImageView imageViewDownload;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -130,6 +145,53 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.MyView
             this.touchImageViewPost = itemView.findViewById(R.id.touchImageViewFeedPost);
             this.imageViewDelete = itemView.findViewById(R.id.imageViewIconDeleteFeedPost);
             this.imageViewLike = itemView.findViewById(R.id.imageViewLikeFeed);
+            this.imageViewDownload = itemView.findViewById(R.id.imageViewDownload);
         }
     }
+
+    public void downloadImage(FeedPost feedPost){
+        toaster.text("Download started");
+        new Thread(() -> {
+
+            String imageUrl = feedPost.getImageUrl();
+
+            try {
+                URL url = new URL(imageUrl);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                InputStream inputStream = connection.getInputStream();
+                File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Camera");
+
+                if (!storageDir.exists())
+                    storageDir.mkdir();
+
+                String fileName = System.currentTimeMillis() + ".jpg";
+                File file = new File(storageDir, fileName);
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+                byte [] buffer = new byte[1024];
+                int bytesRead;
+
+                while ((bytesRead = inputStream.read(buffer)) != -1){
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                }
+
+                fileOutputStream.close();
+                inputStream.close();
+
+                Log.d("Tag", "Download successful");
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }).start();
+    }
+
 }
+
+
+
+
+
+

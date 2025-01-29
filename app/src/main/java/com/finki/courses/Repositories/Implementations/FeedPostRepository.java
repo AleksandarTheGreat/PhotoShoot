@@ -30,8 +30,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,13 +92,22 @@ public class FeedPostRepository implements IFeedPostRepository {
                                 List<String> listComments = (List<String>) map.get("listComments");
                                 List<String> listLikes = (List<String>) map.get("listLikes");
 
+                                String dateTimePostedAt = (String) map.get("postedAt");
+                                LocalDateTime postedAt = parseThisFuckingDate(dateTimePostedAt);
+
                                 Set<String> setLikes = new HashSet<>(listLikes);
-                                FeedPost feedPost = new FeedPost(id, email, imageUrl, fileLocation, setLikes, listComments);
+                                FeedPost feedPost = new FeedPost(id, email, imageUrl, fileLocation, setLikes, listComments, postedAt);
                                 feedPosts.add(feedPost);
                             }
                         }
 
-                        Collections.shuffle(feedPosts);
+                        if (!feedPosts.isEmpty())
+                            feedPosts = feedPosts.stream()
+                                    .sorted(Comparator
+                                            .comparing(FeedPost::getPostedAt)
+                                            .reversed())
+                                    .collect(Collectors.toList());
+
                         FeedPostAdapter feedPostAdapter = new FeedPostAdapter(context, feedPosts, feedPostRepository, mainActivityHelper);
 
                         fragmentFeedBinding.recyclerViewFeed.setLayoutManager(new LinearLayoutManager(context));
@@ -134,8 +146,12 @@ public class FeedPostRepository implements IFeedPostRepository {
                 mapFeedPost.put("listLikes", feedPost.likesSetToList());
                 mapFeedPost.put("listComments", feedPost.getListComments());
 
-                list.add(mapFeedPost);
+                @SuppressLint({"NewApi", "LocalSuppress"})
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss");
+                @SuppressLint({"NewApi", "LocalSuppress"}) String postedAt = feedPost.getPostedAt().format(formatter);
+                mapFeedPost.put("postedAt", postedAt);
 
+                list.add(mapFeedPost);
                 firebaseFirestore.collection(COLLECTION_FEED_POSTS)
                         .document(documentName)
                         .update("list", list)
@@ -285,4 +301,32 @@ public class FeedPostRepository implements IFeedPostRepository {
                     }
                 });
     }
+
+
+    @SuppressLint("NewApi")
+    private LocalDateTime parseThisFuckingDate(String postedAt) {
+        String [] mainParts = postedAt.split(" ");
+        String [] dateParts = mainParts[0].split("\\.");
+        String [] timeParts = mainParts[1].split(":");
+
+        int day = Integer.parseInt(dateParts[0]);
+        int month = Integer.parseInt(dateParts[1]);
+        int year = Integer.parseInt(dateParts[2]);
+
+        int hour = Integer.parseInt(timeParts[0]);
+        int minute = Integer.parseInt(timeParts[1]);
+        int second = Integer.parseInt(timeParts[2]);
+
+        return LocalDateTime.of(year, month, day, hour, minute, second);
+    }
 }
+
+
+
+
+
+
+
+
+
+

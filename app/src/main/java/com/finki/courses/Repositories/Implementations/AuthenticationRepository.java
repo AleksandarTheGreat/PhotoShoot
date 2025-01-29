@@ -77,7 +77,7 @@ public class AuthenticationRepository implements IAuthenticationRepository {
                         Map<String, Object> userMap = new HashMap<>();
                         userMap.put("user", user);
 
-                        String documentName = firebaseUser.getEmail().toString();
+                        String documentName = firebaseUser.getEmail();
                         firebaseFirestore.collection(COLLECTION_USERS).document(documentName)
                                 .set(userMap)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {

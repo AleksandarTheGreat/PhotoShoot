@@ -5,6 +5,18 @@
     android:layout_height="match_parent">
 
     <ImageView
+        android:id="@+id/imageViewDownload"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="16dp"
+        android:padding="12dp"
+        android:background="@drawable/back_for_delete"
+        android:src="@drawable/ic_download"
+        android:elevation="2dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
         android:id="@+id/imageViewIconDeleteFeedPost"
         android:layout_width="50dp"
         android:layout_height="50dp"
