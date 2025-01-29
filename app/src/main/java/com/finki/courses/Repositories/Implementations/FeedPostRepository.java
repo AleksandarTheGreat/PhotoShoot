@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -47,8 +48,6 @@ public class FeedPostRepository implements IFeedPostRepository {
     private Toaster toaster;
     private Context context;
     private MainActivityHelper mainActivityHelper;
-
-    private FragmentFeedBinding fragmentFeedBinding;
     private static final String COLLECTION_FEED_POSTS = "FeedPosts";
     private FeedPostRepository feedPostRepository;
 
@@ -68,32 +67,37 @@ public class FeedPostRepository implements IFeedPostRepository {
 
     @Override
     public void listAll(FragmentFeedBinding fragmentFeedBinding) {
-        String email = firebaseAuth.getCurrentUser().getEmail();
-        DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_FEED_POSTS).document(email);
-        documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        firebaseFirestore.collection(COLLECTION_FEED_POSTS)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         List<FeedPost> feedPosts = new ArrayList<>();
+                        List<DocumentSnapshot> documentSnapshots = queryDocumentSnapshots.getDocuments();
 
-                        List<Map<String, Object>> list = (List<Map<String, Object>>) documentSnapshot.get("list");
-                        for (int i=0;i<list.size();i++){
-                            Map<String, Object> map = list.get(i);
+                        for (int i=0;i<documentSnapshots.size();i++){
+                            DocumentSnapshot documentSnapshot = documentSnapshots.get(i);
 
-                            long id = (long) map.get("id");
-                            String email = (String) map.get("email");
-                            String imageUrl = (String) map.get("imageUrl");
-                            String fileLocation = (String) map.get("fileLocation");
-                            List<String> listComments = (List<String>) map.get("listComments");
-                            List<String> listLikes = (List<String>) map.get("listLikes");
+                            List<Map<String, Object>> list = (List<Map<String, Object>>) documentSnapshot.get("list");
+                            for (int j=0;j<list.size();j++){
+                                Map<String, Object> map = list.get(j);
 
-                            Set<String> setLikes = new HashSet<>(listLikes);
-                            FeedPost feedPost = new FeedPost(id, email, imageUrl, fileLocation, setLikes, listComments);
-                            feedPosts.add(feedPost);
+                                long id = (long) map.get("id");
+                                String email = (String) map.get("email");
+                                String imageUrl = (String) map.get("imageUrl");
+                                String fileLocation = (String) map.get("fileLocation");
+                                List<String> listComments = (List<String>) map.get("listComments");
+                                List<String> listLikes = (List<String>) map.get("listLikes");
+
+                                Set<String> setLikes = new HashSet<>(listLikes);
+                                FeedPost feedPost = new FeedPost(id, email, imageUrl, fileLocation, setLikes, listComments);
+                                feedPosts.add(feedPost);
+                            }
                         }
 
                         Collections.shuffle(feedPosts);
                         FeedPostAdapter feedPostAdapter = new FeedPostAdapter(context, feedPosts, feedPostRepository, mainActivityHelper);
+
                         fragmentFeedBinding.recyclerViewFeed.setLayoutManager(new LinearLayoutManager(context));
                         fragmentFeedBinding.recyclerViewFeed.setHasFixedSize(true);
                         fragmentFeedBinding.recyclerViewFeed.setAdapter(feedPostAdapter);

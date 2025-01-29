@@ -149,67 +149,58 @@
             android:layout_width="match_parent"
             android:orientation="horizontal">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center">
 
                 <ImageView
                     android:id="@+id/imageViewCategories"
                     android:layout_height="40dp"
                     android:layout_width="40dp"
-                    android:padding="8dp"
+                    android:padding="12dp"
                     android:src="@drawable/ic_category_white"
-                    android:layout_marginStart="12dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     />
 
                 <TextView
                     android:id="@+id/textViewTotalCategories"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="Total Categories"
-                    android:textSize="16sp"
+                    android:text="Categories"
+                    android:textSize="18sp"
                     android:textColor="@color/white"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/imageViewCategories"
                     />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center"
+                >
 
                 <ImageView
                     android:id="@+id/imageViewPosts"
                     android:layout_height="40dp"
                     android:layout_width="40dp"
                     android:src="@drawable/ic_post_white"
-                    android:layout_marginStart="12dp"
-                    android:padding="4dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:padding="8dp"
                     />
 
                 <TextView
                     android:id="@+id/textViewTotalPosts"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="Total posts"
-                    android:textSize="16sp"
+                    android:text="Posts"
+                    android:textSize="18sp"
                     android:textColor="@color/white"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/imageViewPosts"
                     />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </LinearLayout>
 
