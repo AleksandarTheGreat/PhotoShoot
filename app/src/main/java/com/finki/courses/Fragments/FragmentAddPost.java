@@ -42,7 +42,6 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     private FragmentAddPostBinding binding;
     private Toaster toaster;
     private static final int REQ_CODE_GALLERY = 1;
-    private static Uri pickedImageUri;
     private Category category;
     private PostRepository postRepository;
     private MainActivityHelper mainActivityHelper;
@@ -79,6 +78,7 @@ public class FragmentAddPost extends Fragment implements IEssentials {
         binding.imageViewAdd.setOnClickListener(view -> {
             Intent openGalleryIntent = new Intent(Intent.ACTION_PICK);
             openGalleryIntent.setType("image/*");
+            openGalleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             startActivityForResult(openGalleryIntent, REQ_CODE_GALLERY);
         });
     }
@@ -92,44 +92,71 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQ_CODE_GALLERY && resultCode == Activity.RESULT_OK && data != null) {
-            binding.imageViewAdd.setVisibility(View.INVISIBLE);
+            // Multiple files selected
+            if (data.getClipData() != null){
+                binding.imageViewAdd.setVisibility(View.INVISIBLE);
 
-            pickedImageUri = data.getData();
-            Picasso.get().load(data.getData()).into(binding.imageViewPickedImage);
+                Picasso.get().load(data.getClipData().getItemAt(0).getUri()).into(binding.imageViewPickedImage);
+                int size = data.getClipData().getItemCount();
 
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
-            builder.setTitle("Upload")
-                    .setMessage("To upload a picture click yes")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            uploadImageToFirebaseStorage();
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            clearImageUri();
-                            mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
-                            dialog.dismiss();
-                        }
-                    })
-                    .setCancelable(false)
-                    .show();
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+                builder.setTitle("Upload")
+                        .setMessage("To upload all " + size + " pictures click yes")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                for (int i=0;i<data.getClipData().getItemCount();i++){
+                                    Uri uri = data.getClipData().getItemAt(i).getUri();
+
+                                    uploadImageToFirebaseStorage(uri);
+                                }
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
+                                dialog.dismiss();
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+            }
+            // Single file selected
+            else if (data.getData() != null){
+                binding.imageViewAdd.setVisibility(View.INVISIBLE);
+
+                Uri pickedImageUri = data.getData();
+                Picasso.get().load(data.getData()).into(binding.imageViewPickedImage);
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+                builder.setTitle("Upload")
+                        .setMessage("To upload a picture click yes")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                uploadImageToFirebaseStorage(pickedImageUri);
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
+                                dialog.dismiss();
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+            }
         }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        clearImageUri();
     }
 
-    public static void clearImageUri() {
-        pickedImageUri = null;
-    }
-
-    private void uploadImageToFirebaseStorage() {
+    private void uploadImageToFirebaseStorage(Uri pickedImageUri) {
         if (pickedImageUri == null) {
             toaster.text("Please pick an image first");
             return;

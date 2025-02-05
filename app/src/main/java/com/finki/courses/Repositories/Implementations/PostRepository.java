@@ -53,7 +53,6 @@ public class PostRepository implements IPostRepository {
     private FirebaseFirestore firebaseFirestore;
     private FragmentAddPostBinding fragmentAddPostBinding;
     private MainActivityHelper mainActivityHelper;
-    private ProgressDialog progressDialog;
 
 
     // FragmentHome usage
@@ -79,7 +78,6 @@ public class PostRepository implements IPostRepository {
         this.email = firebaseAuth.getCurrentUser().getEmail();
 
         this.toaster = new Toaster(context);
-        this.progressDialog = new ProgressDialog(context);
     }
 
     // FragmentGallery usage
@@ -94,6 +92,11 @@ public class PostRepository implements IPostRepository {
 
     @Override
     public void add(long categoryId, Post post) {
+        ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("Adding...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -126,7 +129,6 @@ public class PostRepository implements IPostRepository {
                                             toaster.text("Added new post");
                                             fragmentAddPostBinding.imageViewAdd.setVisibility(View.VISIBLE);
                                             fragmentAddPostBinding.imageViewPickedImage.setImageResource(0);
-                                            FragmentAddPost.clearImageUri();
                                             progressDialog.dismiss();
 
                                             mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
@@ -140,7 +142,6 @@ public class PostRepository implements IPostRepository {
                                             toaster.text(e.getLocalizedMessage());
                                             fragmentAddPostBinding.imageViewAdd.setVisibility(View.VISIBLE);
                                             fragmentAddPostBinding.imageViewPickedImage.setImageResource(0);
-                                            FragmentAddPost.clearImageUri();
                                             progressDialog.dismiss();
                                         }
                                     });
@@ -148,7 +149,6 @@ public class PostRepository implements IPostRepository {
                             toaster.text("Category not found");
                             fragmentAddPostBinding.imageViewAdd.setVisibility(View.VISIBLE);
                             fragmentAddPostBinding.imageViewPickedImage.setImageResource(0);
-                            FragmentAddPost.clearImageUri();
                             progressDialog.dismiss();
                         }
                     }
@@ -160,7 +160,6 @@ public class PostRepository implements IPostRepository {
                         toaster.text(e.getLocalizedMessage());
                         fragmentAddPostBinding.imageViewAdd.setVisibility(View.VISIBLE);
                         fragmentAddPostBinding.imageViewPickedImage.setImageResource(0);
-                        FragmentAddPost.clearImageUri();
                         progressDialog.dismiss();
                     }
                 });
@@ -170,11 +169,11 @@ public class PostRepository implements IPostRepository {
     public void uploadImage(Category category, InputStream inputStream) {
         // File location for the image should be
         // /email/category/imageName.jpg
-
         String email = firebaseAuth.getCurrentUser().getEmail();
         String categoryName = category.getName();
         String fileName = "/" + email + "/" + categoryName + "/" + System.currentTimeMillis() + ".jpg";
 
+        ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Uploading...");
         progressDialog.setCancelable(false);
         progressDialog.show();
@@ -192,6 +191,7 @@ public class PostRepository implements IPostRepository {
                                         long postId = UUID.randomUUID().getLeastSignificantBits() * -1;
                                         Post post = new Post(postId, fileName, imageUriToString);
                                         add(category.getId(), post);
+                                        progressDialog.dismiss();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -200,7 +200,6 @@ public class PostRepository implements IPostRepository {
                                         toaster.text(e.getMessage());
                                         Log.d("Tag", e.getLocalizedMessage());
                                         progressDialog.dismiss();
-                                        FragmentAddPost.clearImageUri();
                                     }
                                 });
                     }
@@ -211,7 +210,6 @@ public class PostRepository implements IPostRepository {
                         toaster.text(e.getMessage());
                         Log.d("Tag", e.getLocalizedMessage());
                         progressDialog.dismiss();
-                        FragmentAddPost.clearImageUri();
                     }
                 });
     }
@@ -219,7 +217,7 @@ public class PostRepository implements IPostRepository {
     @Override
     public void deleteById(long categoryId, long postId) {
         ProgressDialog progressDialogDelete = new ProgressDialog(context);
-        progressDialogDelete.setTitle("Deleting");
+        progressDialogDelete.setTitle("Deleting...");
         progressDialogDelete.setCancelable(false);
         progressDialogDelete.show();
 
