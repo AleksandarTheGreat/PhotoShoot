@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.finki.courses.Fragments.FragmentFeed;
 import com.finki.courses.Fragments.FragmentGallery;
@@ -17,11 +18,16 @@ import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Fragments.FragmentUser;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Helper.Implementations.Toaster;
+import com.finki.courses.Model.Category;
 import com.finki.courses.R;
+import com.finki.courses.Repositories.Callbacks.OnCategoriesLoadedCallBack;
+import com.finki.courses.ViewModel.ViewModelCategories;
 import com.finki.courses.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.List;
 
 public class MainActivity extends ParentActivity {
 
@@ -33,6 +39,9 @@ public class MainActivity extends ParentActivity {
     private FragmentGallery fragmentGallery;
     private FragmentFeed fragmentFeed;
     private FirebaseAuth firebaseAuth;
+
+    // ViewModels Here
+    private ViewModelCategories viewModelCategories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +72,17 @@ public class MainActivity extends ParentActivity {
         } else {
             Log.d("Tag", "'" + user.getEmail() + "' is signed in");
         }
+
+        // ViewModels here
+        viewModelCategories = new ViewModelProvider(this).get(ViewModelCategories.class);
+        viewModelCategories.init(MainActivity.this);
+        viewModelCategories.listAll(new OnCategoriesLoadedCallBack() {
+            @Override
+            public void onLoaded(List<Category> categories) {
+                viewModelCategories.getMutableLiveDataCategories().setValue(categories);
+                toaster.text("Loaded all from firebase just ONCE");
+            }
+        });
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

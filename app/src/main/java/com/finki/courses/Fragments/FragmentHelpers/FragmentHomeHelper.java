@@ -34,9 +34,12 @@ import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
 import com.finki.courses.Model.User;
 import com.finki.courses.R;
+import com.finki.courses.Repositories.Callbacks.OnCategoryAddedCallback;
+import com.finki.courses.Repositories.Callbacks.OnCategoryDeletedCallback;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
 import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Utils.ThemeUtils;
+import com.finki.courses.ViewModel.ViewModelCategories;
 import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -66,20 +69,22 @@ public class FragmentHomeHelper {
     private Context context;
     private FragmentHomeBinding binding;
     private MainActivityHelper mainActivityHelper;
+    private ViewModelCategories viewModelCategories;
 
     private CategoryRepository categoryRepository;
     private PostRepository postRepository;
     private Toaster toaster;
     private boolean isNightModeOn;
 
-    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, MainActivityHelper mainActivityHelper) {
+    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, ViewModelCategories viewModelCategories, MainActivityHelper mainActivityHelper) {
         this.context = context;
         this.binding = binding;
+        this.viewModelCategories = viewModelCategories;
         this.mainActivityHelper = mainActivityHelper;
 
         this.postRepository = new PostRepository(context, mainActivityHelper);
-        this.categoryRepository = new CategoryRepository(context, binding, this);
         this.toaster = new Toaster(context);
+        this.categoryRepository = viewModelCategories.getCategoryRepository();
 
         this.isNightModeOn = ThemeUtils.isNightModeOn(context);
     }
@@ -101,7 +106,17 @@ public class FragmentHomeHelper {
                         if (text.isEmpty())
                             return;
 
-                        categoryRepository.add(text);
+                        viewModelCategories.add(text, new OnCategoryAddedCallback() {
+                            @Override
+                            public void onCategoryAdded(boolean addedSuccessfully, Category category) {
+                                if (addedSuccessfully){
+                                    List<Category> categories = viewModelCategories.getMutableLiveDataCategories().getValue();
+                                    categories.add(category);
+
+                                    viewModelCategories.getMutableLiveDataCategories().setValue(categories);
+                                }
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -191,7 +206,17 @@ public class FragmentHomeHelper {
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            categoryRepository.deleteById(category.getId());
+                            viewModelCategories.deleteById(category.getId(), new OnCategoryDeletedCallback() {
+                                @Override
+                                public void onCategoryDeleted(boolean deletedSuccessfully, long id) {
+                                    if (deletedSuccessfully){
+                                        List<Category> categories = viewModelCategories.getMutableLiveDataCategories().getValue();
+                                        categories.remove(category);
+
+                                        viewModelCategories.getMutableLiveDataCategories().setValue(categories);
+                                    }
+                                }
+                            });
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {

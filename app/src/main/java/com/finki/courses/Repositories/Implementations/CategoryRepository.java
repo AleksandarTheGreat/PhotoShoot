@@ -12,6 +12,9 @@ import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
+import com.finki.courses.Repositories.Callbacks.OnCategoriesLoadedCallBack;
+import com.finki.courses.Repositories.Callbacks.OnCategoryAddedCallback;
+import com.finki.courses.Repositories.Callbacks.OnCategoryDeletedCallback;
 import com.finki.courses.Repositories.ICategoriesRepository;
 import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,19 +42,14 @@ public class CategoryRepository implements ICategoriesRepository {
 
     private static final String COLLECTION_NAME = "Users";
     private final Context context;
-    private final FragmentHomeBinding binding;
-    private final FragmentHomeHelper fragmentHomeHelper;
     private final FirebaseAuth firebaseAuth;
     private final FirebaseFirestore firebaseFirestore;
     private final String email;
-
     private final Toaster toaster;
     private List<Category> categoryList;
 
-    public CategoryRepository(Context context, FragmentHomeBinding binding, FragmentHomeHelper fragmentHomeHelper) {
+    public CategoryRepository(Context context){
         this.context = context;
-        this.binding = binding;
-        this.fragmentHomeHelper = fragmentHomeHelper;
 
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.firebaseFirestore = FirebaseFirestore.getInstance();
@@ -62,8 +60,7 @@ public class CategoryRepository implements ICategoriesRepository {
     }
 
     @Override
-    public void listAll() {
-        binding.linearLayoutCategories.removeAllViews();
+    public void listAll(OnCategoriesLoadedCallBack onCategoriesLoadedCallBack) {
         categoryList = new ArrayList<>();
 
         DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
@@ -88,23 +85,15 @@ public class CategoryRepository implements ICategoriesRepository {
                                     }
                                 });
 
-                                if (!categoryList.isEmpty()) {
-                                    fragmentHomeHelper.showScrollViewAndHideLinearLayout();
-                                } else {
-                                    fragmentHomeHelper.hideScrollViewAndShowLinearLayout();
-                                }
+                                onCategoriesLoadedCallBack.onLoaded(categoryList);
 
-                                for (Category category : categoryList) {
-                                    fragmentHomeHelper.buildUILayoutForCategory(category);
-                                }
-
-                                toaster.text("Loaded all from firebase");
-                                Log.d("Tag", "All categories are : " + categoryList);
                             } else {
                                 toaster.text("Document doesn't exist, yet");
+                                onCategoriesLoadedCallBack.onLoaded(categoryList);
                             }
                         } else {
                             toaster.text("Task failed");
+                            onCategoriesLoadedCallBack.onLoaded(categoryList);
                         }
                     }
                 })
@@ -112,6 +101,7 @@ public class CategoryRepository implements ICategoriesRepository {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         toaster.text("Failed to retrieve the document");
+                        onCategoriesLoadedCallBack.onLoaded(categoryList);
                     }
                 });
     }
@@ -148,7 +138,7 @@ public class CategoryRepository implements ICategoriesRepository {
     }
 
     @Override
-    public void add(String name) {
+    public void add(String name, OnCategoryAddedCallback onCategoryAddedCallback) {
         // Get the document corresponding to that email
         DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get()
@@ -172,15 +162,14 @@ public class CategoryRepository implements ICategoriesRepository {
                                         @Override
                                         public void onSuccess(Void unused) {
                                             toaster.text("Added new category");
-
-                                            fragmentHomeHelper.showScrollViewAndHideLinearLayout();
-                                            fragmentHomeHelper.buildUILayoutForCategory(new Category(categoryID, name, new ArrayList<>()));
+                                            onCategoryAddedCallback.onCategoryAdded(true, new Category(categoryID, name, new ArrayList<>()));
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.d("Tag", "Failed to add new category");
+                                            onCategoryAddedCallback.onCategoryAdded(false, null);
                                         }
                                     });
                         } else {
@@ -211,15 +200,14 @@ public class CategoryRepository implements ICategoriesRepository {
                                         @Override
                                         public void onSuccess(Void unused) {
                                             toaster.text("Added new category");
-
-                                            fragmentHomeHelper.showScrollViewAndHideLinearLayout();
-                                            fragmentHomeHelper.buildUILayoutForCategory(new Category(categoryId, name, new ArrayList<>()));
+                                            onCategoryAddedCallback.onCategoryAdded(true, new Category(categoryId, name, new ArrayList<>()));
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.d("Tag", e.getLocalizedMessage());
+                                            onCategoryAddedCallback.onCategoryAdded(false, null);
                                         }
                                     });
                         }
@@ -229,12 +217,13 @@ public class CategoryRepository implements ICategoriesRepository {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d("Tag", e.getLocalizedMessage());
+                        onCategoryAddedCallback.onCategoryAdded(false, null);
                     }
                 });
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteById(long id, OnCategoryDeletedCallback onCategoryDeletedCallback) {
         DocumentReference documentReference = firebaseFirestore.collection(COLLECTION_NAME).document(email);
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -257,6 +246,10 @@ public class CategoryRepository implements ICategoriesRepository {
 
                                     Log.d("Tag", "ID: " + idd + "\nImage url: " + imageUrl + "\nName: " + name);
                                     StorageReference imageRef = FirebaseStorage.getInstance().getReference().child(name);
+
+                                    // Somehow wait for all of these async deletes to finish,
+                                    // Then continue to remove the list I guess ??
+
                                     imageRef.delete()
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -280,7 +273,7 @@ public class CategoryRepository implements ICategoriesRepository {
                                             @Override
                                             public void onSuccess(Void unused) {
 
-                                                fragmentHomeHelper.deleteUILayoutForCategory(id);
+                                                onCategoryDeletedCallback.onCategoryDeleted(true, id);
                                                 toaster.text("Deleted category");
                                             }
                                         })
@@ -288,6 +281,7 @@ public class CategoryRepository implements ICategoriesRepository {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 Log.d("Tag", e.getLocalizedMessage());
+                                                onCategoryDeletedCallback.onCategoryDeleted(false, id);
                                             }
                                         });
                                 break;
@@ -299,6 +293,7 @@ public class CategoryRepository implements ICategoriesRepository {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d("Tag", e.getLocalizedMessage());
+                        onCategoryDeletedCallback.onCategoryDeleted(false, id);
                     }
                 });
     }

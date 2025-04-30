@@ -7,7 +7,10 @@ import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +24,11 @@ import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.R;
+import com.finki.courses.Repositories.Callbacks.OnCategoryAddedCallback;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
 import com.finki.courses.Repositories.Implementations.UserRepository;
 import com.finki.courses.Utils.ThemeUtils;
+import com.finki.courses.ViewModel.ViewModelCategories;
 import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -32,6 +37,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.protobuf.GeneratedMessageLite;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentHome extends Fragment implements IEssentials {
@@ -43,6 +49,8 @@ public class FragmentHome extends Fragment implements IEssentials {
     private CategoryRepository categoryRepository;
     private boolean isNightModeOn;
     private UserRepository userRepository;
+
+    private ViewModelCategories viewModelCategories;
 
     public FragmentHome() {
         // Required empty public constructor
@@ -66,10 +74,29 @@ public class FragmentHome extends Fragment implements IEssentials {
     @Override
     public void instantiateObjects() {
         isNightModeOn = ThemeUtils.isNightModeOn(getContext());
-        fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, mainActivityHelper);
 
-        categoryRepository = new CategoryRepository(getContext(), binding, fragmentHomeHelper);
-        categoryRepository.listAll();
+        viewModelCategories = new ViewModelProvider(requireActivity()).get(ViewModelCategories.class);
+        fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, viewModelCategories, mainActivityHelper);
+
+        viewModelCategories.getMutableLiveDataCategories().observe(getViewLifecycleOwner(), new Observer<List<Category>>() {
+            @Override
+            public void onChanged(List<Category> categories) {
+                if (!categories.isEmpty()) {
+
+                    binding.linearLayoutCategories.removeAllViews();
+                    fragmentHomeHelper.showScrollViewAndHideLinearLayout();
+
+                    for (Category category : categories) {
+                        fragmentHomeHelper.buildUILayoutForCategory(category);
+                    }
+
+                    toaster.text("Built the UI, not from firebase");
+                    Log.d("Tag", "All categories are : " + categories);
+                } else {
+                    fragmentHomeHelper.hideScrollViewAndShowLinearLayout();
+                }
+            }
+        });
 
         toaster = new Toaster(getContext());
         userRepository = new UserRepository(getContext());
