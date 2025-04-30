@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,8 +22,12 @@ import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
 import com.finki.courses.R;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoriesLoadedCallBack;
+import com.finki.courses.Repositories.Callbacks.Post.OnPostAddedCallback;
 import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Utils.ThemeUtils;
+import com.finki.courses.ViewModel.ViewModelCategories;
+import com.finki.courses.ViewModel.ViewModelPosts;
 import com.finki.courses.databinding.FragmentAddPostBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,6 +40,7 @@ import com.squareup.picasso.Picasso;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 public class FragmentAddPost extends Fragment implements IEssentials {
@@ -45,6 +51,10 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     private Category category;
     private PostRepository postRepository;
     private MainActivityHelper mainActivityHelper;
+
+    private ViewModelPosts viewModelPosts;
+    private ViewModelCategories viewModelCategories;
+
 
     public FragmentAddPost() {
         // Required empty public constructor
@@ -71,6 +81,9 @@ public class FragmentAddPost extends Fragment implements IEssentials {
     public void instantiateObjects() {
         postRepository = new PostRepository(getContext(), binding, mainActivityHelper);
         toaster = new Toaster(getContext());
+
+        viewModelCategories = new ViewModelProvider(requireActivity()).get(ViewModelCategories.class);
+        viewModelPosts = new ViewModelProvider(requireActivity()).get(ViewModelPosts.class);
     }
 
     @Override
@@ -165,7 +178,31 @@ public class FragmentAddPost extends Fragment implements IEssentials {
         try {
             InputStream inputStream = getContext().getContentResolver().openInputStream(pickedImageUri);
             if (inputStream != null) {
-                postRepository.uploadImage(category, inputStream);
+                viewModelPosts.uploadImage(category, inputStream, new OnPostAddedCallback() {
+                    @Override
+                    public void onPostAdded(long categoryId, Post post, boolean addedSuccessfully) {
+                        if (addedSuccessfully){
+
+                            // somehow wait for all the images to be uploaded before going to fragment home,
+                            // but that is not the major task right now.
+
+                            toaster.text("Added new post");
+
+                            binding.imageViewAdd.setVisibility(View.VISIBLE);
+                            binding.imageViewPickedImage.setImageResource(0);
+
+                            // this is not an optimal solution, I need to change this.
+                            viewModelCategories.listAll(categories -> viewModelCategories.getMutableLiveDataCategories().setValue(categories));
+                            mainActivityHelper.changeFragments(new FragmentHome(mainActivityHelper), false);
+
+                            // Don't forget to call categories - list all method
+
+                        } else {
+                            binding.imageViewAdd.setVisibility(View.VISIBLE);
+                            binding.imageViewPickedImage.setImageResource(0);
+                        }
+                    }
+                });
             } else {
                 toaster.text("Somehow the inputStream is null");
             }

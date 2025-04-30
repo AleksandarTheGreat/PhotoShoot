@@ -1,11 +1,7 @@
 package com.finki.courses.Fragments;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -14,8 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
@@ -24,20 +18,14 @@ import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.R;
-import com.finki.courses.Repositories.Callbacks.OnCategoryAddedCallback;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
 import com.finki.courses.Repositories.Implementations.UserRepository;
 import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.ViewModel.ViewModelCategories;
+import com.finki.courses.ViewModel.ViewModelPosts;
 import com.finki.courses.databinding.FragmentHomeBinding;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.protobuf.GeneratedMessageLite;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentHome extends Fragment implements IEssentials {
@@ -51,6 +39,7 @@ public class FragmentHome extends Fragment implements IEssentials {
     private UserRepository userRepository;
 
     private ViewModelCategories viewModelCategories;
+    private ViewModelPosts viewModelPosts;
 
     public FragmentHome() {
         // Required empty public constructor
@@ -75,8 +64,9 @@ public class FragmentHome extends Fragment implements IEssentials {
     public void instantiateObjects() {
         isNightModeOn = ThemeUtils.isNightModeOn(getContext());
 
+        viewModelPosts = new ViewModelProvider(requireActivity()).get(ViewModelPosts.class);
         viewModelCategories = new ViewModelProvider(requireActivity()).get(ViewModelCategories.class);
-        fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, viewModelCategories, mainActivityHelper);
+        fragmentHomeHelper = new FragmentHomeHelper(getContext(), binding, viewModelCategories, viewModelPosts, mainActivityHelper);
 
         viewModelCategories.getMutableLiveDataCategories().observe(getViewLifecycleOwner(), new Observer<List<Category>>() {
             @Override

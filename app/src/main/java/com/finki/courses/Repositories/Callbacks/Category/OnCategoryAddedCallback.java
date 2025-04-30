@@ -1,4 +1,4 @@
-package com.finki.courses.Repositories.Callbacks;
+package com.finki.courses.Repositories.Callbacks.Category;
 
 import com.finki.courses.Model.Category;
 

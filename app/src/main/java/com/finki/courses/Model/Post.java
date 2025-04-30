@@ -39,6 +39,10 @@ public class Post {
         return DateTimeFormatter.ofPattern("dd.MM.yyyy 'at' hh:mm").format(postedAt);
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public long getId() {
         return id;
     }

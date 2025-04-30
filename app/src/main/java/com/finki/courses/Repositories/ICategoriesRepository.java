@@ -1,11 +1,9 @@
 package com.finki.courses.Repositories;
 
 import com.finki.courses.Model.Category;
-import com.finki.courses.Repositories.Callbacks.OnCategoriesLoadedCallBack;
-import com.finki.courses.Repositories.Callbacks.OnCategoryAddedCallback;
-import com.finki.courses.Repositories.Callbacks.OnCategoryDeletedCallback;
-
-import java.util.List;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoriesLoadedCallBack;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoryAddedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoryDeletedCallback;
 
 public interface ICategoriesRepository {
 

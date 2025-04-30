@@ -5,14 +5,12 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.finki.courses.Fragments.FragmentHelpers.FragmentHomeHelper;
 import com.finki.courses.Model.Category;
-import com.finki.courses.Repositories.Callbacks.OnCategoriesLoadedCallBack;
-import com.finki.courses.Repositories.Callbacks.OnCategoryAddedCallback;
-import com.finki.courses.Repositories.Callbacks.OnCategoryDeletedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoriesLoadedCallBack;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoryAddedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoryDeletedCallback;
 import com.finki.courses.Repositories.ICategoriesRepository;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
-import com.finki.courses.databinding.FragmentHomeBinding;
 
 import java.util.List;
 

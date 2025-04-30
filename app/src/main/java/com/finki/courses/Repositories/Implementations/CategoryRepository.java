@@ -2,21 +2,16 @@ package com.finki.courses.Repositories.Implementations;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.finki.courses.Fragments.FragmentHelpers.FragmentHomeHelper;
-import com.finki.courses.Fragments.FragmentHome;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.Model.Post;
-import com.finki.courses.Repositories.Callbacks.OnCategoriesLoadedCallBack;
-import com.finki.courses.Repositories.Callbacks.OnCategoryAddedCallback;
-import com.finki.courses.Repositories.Callbacks.OnCategoryDeletedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoriesLoadedCallBack;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoryAddedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoryDeletedCallback;
 import com.finki.courses.Repositories.ICategoriesRepository;
-import com.finki.courses.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,10 +22,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firestore.v1.Document;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,68 +1,47 @@
 package com.finki.courses.Fragments.FragmentHelpers;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
-import com.finki.courses.Fragments.FragmentGallery;
 import com.finki.courses.Fragments.ImageSliderFragment;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
-import com.finki.courses.Model.Post;
-import com.finki.courses.Model.User;
 import com.finki.courses.R;
-import com.finki.courses.Repositories.Callbacks.OnCategoryAddedCallback;
-import com.finki.courses.Repositories.Callbacks.OnCategoryDeletedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoryAddedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoryDeletedCallback;
+import com.finki.courses.Repositories.Callbacks.Post.OnPostDeletedCallback;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
 import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Utils.ThemeUtils;
 import com.finki.courses.ViewModel.ViewModelCategories;
+import com.finki.courses.ViewModel.ViewModelPosts;
 import com.finki.courses.databinding.FragmentHomeBinding;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.stream.Collectors;
 
 public class FragmentHomeHelper {
 
@@ -70,16 +49,19 @@ public class FragmentHomeHelper {
     private FragmentHomeBinding binding;
     private MainActivityHelper mainActivityHelper;
     private ViewModelCategories viewModelCategories;
+    private ViewModelPosts viewModelPosts;
 
     private CategoryRepository categoryRepository;
     private PostRepository postRepository;
     private Toaster toaster;
     private boolean isNightModeOn;
 
-    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, ViewModelCategories viewModelCategories, MainActivityHelper mainActivityHelper) {
+    public FragmentHomeHelper(Context context, FragmentHomeBinding binding, ViewModelCategories viewModelCategories, ViewModelPosts viewModelPosts,
+                              MainActivityHelper mainActivityHelper) {
         this.context = context;
         this.binding = binding;
         this.viewModelCategories = viewModelCategories;
+        this.viewModelPosts = viewModelPosts;
         this.mainActivityHelper = mainActivityHelper;
 
         this.postRepository = new PostRepository(context, mainActivityHelper);
@@ -109,7 +91,7 @@ public class FragmentHomeHelper {
                         viewModelCategories.add(text, new OnCategoryAddedCallback() {
                             @Override
                             public void onCategoryAdded(boolean addedSuccessfully, Category category) {
-                                if (addedSuccessfully){
+                                if (addedSuccessfully) {
                                     List<Category> categories = viewModelCategories.getMutableLiveDataCategories().getValue();
                                     categories.add(category);
 
@@ -134,7 +116,7 @@ public class FragmentHomeHelper {
         List<Map<String, Object>> postList = category.getPostList();
 
         LinearLayout.LayoutParams layoutParamsFullLinearLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsFullLinearLayout.setMargins(0,0,0,0);
+        layoutParamsFullLinearLayout.setMargins(0, 0, 0, 0);
 
         LinearLayout linearLayoutFullCategory = new LinearLayout(context);
         linearLayoutFullCategory.setOrientation(LinearLayout.VERTICAL);
@@ -177,16 +159,14 @@ public class FragmentHomeHelper {
         textViewCategoryTitle.setLayoutParams(layoutParamsTextViewName);
 
 
-
         RelativeLayout.LayoutParams layoutParamsTextViewSize = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsTextViewSize.setMargins(0,24,0,0);
+        layoutParamsTextViewSize.setMargins(0, 24, 0, 0);
         layoutParamsTextViewSize.addRule(RelativeLayout.BELOW, textViewCategoryTitle.getId());
 
         TextView textViewSize = new TextView(context);
         textViewSize.setTextSize(14);
         textViewSize.setText(category.getPostList().size() + " images in this category");
         textViewSize.setLayoutParams(layoutParamsTextViewSize);
-
 
 
         // Icon delete category
@@ -209,7 +189,7 @@ public class FragmentHomeHelper {
                             viewModelCategories.deleteById(category.getId(), new OnCategoryDeletedCallback() {
                                 @Override
                                 public void onCategoryDeleted(boolean deletedSuccessfully, long id) {
-                                    if (deletedSuccessfully){
+                                    if (deletedSuccessfully) {
                                         List<Category> categories = viewModelCategories.getMutableLiveDataCategories().getValue();
                                         categories.remove(category);
 
@@ -290,7 +270,7 @@ public class FragmentHomeHelper {
         int primaryColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, Color.BLUE);
         TextView textViewButton = new TextView(context);
         textViewButton.setTextColor(primaryColor);
-        textViewButton.setPadding(4,4,4,4);
+        textViewButton.setPadding(4, 4, 4, 4);
         textViewButton.setTextSize(16);
         textViewButton.setTypeface(Typeface.DEFAULT_BOLD);
         textViewButton.setText("Create a post +");
@@ -354,8 +334,15 @@ public class FragmentHomeHelper {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     long postId = Long.parseLong(String.valueOf(postMap.get("id")));
-
-                                    postRepository.deleteById(category.getId(), postId);
+                                    // Here
+                                    viewModelPosts.deleteById(category.getId(), postId, new OnPostDeletedCallback() {
+                                        @Override
+                                        public void onPostDeleted(boolean deletedSuccessfully) {
+                                            if (deletedSuccessfully) {
+                                                viewModelCategories.listAll(categories -> viewModelCategories.getMutableLiveDataCategories().setValue(categories));
+                                            }
+                                        }
+                                    });
                                 }
                             })
                             .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -377,7 +364,7 @@ public class FragmentHomeHelper {
             layoutParamsForImageView.setMargins(0, 0, 0, 0);
 
             ImageView imageViewPost = new ImageView(context);
-            if (postMap.get("imageUrl").equals("")){
+            if (postMap.get("imageUrl").equals("")) {
                 imageViewPost.setImageResource(0);
             } else {
                 Glide.with(context)
@@ -397,14 +384,14 @@ public class FragmentHomeHelper {
         return horizontalScrollView;
     }
 
-    public void deleteUILayoutForCategory(long id){
+    public void deleteUILayoutForCategory(long id) {
         LinearLayout mainLinearLayout = binding.linearLayoutCategories;
 
-        for (int i=0;i<mainLinearLayout.getChildCount();i++){
+        for (int i = 0; i < mainLinearLayout.getChildCount(); i++) {
             LinearLayout linearLayoutCategory = (LinearLayout) mainLinearLayout.getChildAt(i);
             long tag = Long.parseLong(linearLayoutCategory.getTag().toString());
 
-            if (tag == id){
+            if (tag == id) {
                 mainLinearLayout.removeViewAt(i);
                 break;
             }

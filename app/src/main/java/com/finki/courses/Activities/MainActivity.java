@@ -20,8 +20,9 @@ import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Category;
 import com.finki.courses.R;
-import com.finki.courses.Repositories.Callbacks.OnCategoriesLoadedCallBack;
+import com.finki.courses.Repositories.Callbacks.Category.OnCategoriesLoadedCallBack;
 import com.finki.courses.ViewModel.ViewModelCategories;
+import com.finki.courses.ViewModel.ViewModelPosts;
 import com.finki.courses.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,6 +43,7 @@ public class MainActivity extends ParentActivity {
 
     // ViewModels Here
     private ViewModelCategories viewModelCategories;
+    private ViewModelPosts viewModelPosts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,9 @@ public class MainActivity extends ParentActivity {
             Log.d("Tag", "'" + user.getEmail() + "' is signed in");
         }
 
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         // ViewModels here
         viewModelCategories = new ViewModelProvider(this).get(ViewModelCategories.class);
         viewModelCategories.init(MainActivity.this);
@@ -84,10 +89,10 @@ public class MainActivity extends ParentActivity {
             }
         });
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
         mainActivityHelper = new MainActivityHelper(MainActivity.this, this, binding);
+
+        viewModelPosts = new ViewModelProvider(this).get(ViewModelPosts.class);
+        viewModelPosts.init(MainActivity.this, mainActivityHelper);
 
         fragmentHome = new FragmentHome(mainActivityHelper);
         fragmentUser = new FragmentUser(mainActivityHelper);
