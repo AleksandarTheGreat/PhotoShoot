@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 
+import com.bumptech.glide.Glide;
 import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Model.Post;
@@ -62,20 +63,10 @@ public class FragmentSingleImage extends Fragment implements IEssentials {
 
         String imageUri = (String) postMap.get("imageUrl");
         Uri uri = Uri.parse(imageUri);
-        Picasso.get()
+        Glide.with(getContext())
                 .load(uri)
-                .networkPolicy(NetworkPolicy.OFFLINE)
-                .into(binding.touchImageViewFragmentSingleImage, new Callback() {
-            @Override
-            public void onSuccess() {
+                .into(binding.touchImageViewFragmentSingleImage);
 
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Picasso.get().load(uri).into(binding.touchImageViewFragmentSingleImage);
-            }
-        });
         Log.d("Tag", imageUri);
     }
 

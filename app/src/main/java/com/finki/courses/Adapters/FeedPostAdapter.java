@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentFeed;
 import com.finki.courses.Helper.Implementations.Toaster;
@@ -68,7 +69,7 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.MyView
         myViewHolder.imageViewDelete.setOnClickListener(v -> {
             FeedPost feedPost = feedPosts.get(myViewHolder.getAdapterPosition());
 
-            if (loggedInUserEmail.equals(feedPost.getEmail())){
+            if (loggedInUserEmail.equals(feedPost.getEmail())) {
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
                 builder.setTitle("Delete post?")
                         .setIcon(R.drawable.ic_close_red)
@@ -107,7 +108,7 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.MyView
 
         String postEmail = feedPost.getEmail();
 
-        if (postEmail.equals(loggedInUserEmail)){
+        if (postEmail.equals(loggedInUserEmail)) {
             holder.imageViewDelete.setVisibility(View.VISIBLE);
         } else {
             holder.imageViewDelete.setVisibility(View.GONE);
@@ -116,7 +117,7 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.MyView
         holder.textViewEmail.setText(feedPost.getEmail());
         holder.textViewTotalLikes.setText(feedPost.totalLikes() + " likes");
         holder.textViewTotalComments.setText(feedPost.totalComments() + " comments");
-        Picasso.get()
+        Glide.with(context)
                 .load(feedPost.getImageUrl())
                 .into(holder.touchImageViewPost);
     }
@@ -149,7 +150,8 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.MyView
         }
     }
 
-    public void downloadImage(FeedPost feedPost){
+    // Make this a service, or with a notification
+    public void downloadImage(FeedPost feedPost) {
         toaster.text("Download started");
         new Thread(() -> {
 
@@ -169,10 +171,10 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.MyView
                 File file = new File(storageDir, fileName);
                 FileOutputStream fileOutputStream = new FileOutputStream(file);
 
-                byte [] buffer = new byte[1024];
+                byte[] buffer = new byte[1024];
                 int bytesRead;
 
-                while ((bytesRead = inputStream.read(buffer)) != -1){
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
                     fileOutputStream.write(buffer, 0, bytesRead);
                 }
 

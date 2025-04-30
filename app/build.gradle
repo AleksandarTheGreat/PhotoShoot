@@ -43,6 +43,7 @@ dependencies {
     implementation libs.firebase.firestore
     implementation libs.firebase.storage
     implementation libs.touchimageview // last SupportLib version
+    implementation libs.glide
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
 import com.finki.courses.Fragments.FragmentUser;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.Repositories.IUserRepository;
@@ -42,7 +43,7 @@ public class UserRepository implements IUserRepository {
     private FragmentUserBinding fragmentUserBinding;
 
     // Used in FragmentHome for the profile picture
-    public UserRepository(Context context){
+    public UserRepository(Context context) {
         this.context = context;
     }
 
@@ -76,7 +77,9 @@ public class UserRepository implements IUserRepository {
                         String imageUrl = String.valueOf(map.get("profilePhotoUrl"));
                         if (imageUrl.isEmpty()) return;
 
-                        Picasso.get().load(imageUrl).into(fragmentUserBinding.imageViewUserPicture);
+                        Glide.with(context)
+                                .load(imageUrl)
+                                .into(fragmentUserBinding.imageViewUserPicture);
                         // IF the picture has not been added to cache when uploaded
                         // Some sort of a safety precaution
                         saveProfilePictureToCache(imageUrl, email);
@@ -235,7 +238,10 @@ public class UserRepository implements IUserRepository {
 
                         if (coverPhotoUrl.isEmpty()) return;
 
-                        Picasso.get().load(coverPhotoUrl).into(fragmentUserBinding.imageViewCoverPhoto);
+                        Glide.with(context)
+                                .load(coverPhotoUrl)
+                                .into(fragmentUserBinding.imageViewCoverPhoto);
+
                         Log.d("Tag", "Loaded cover picture from firebase");
                     }
                 })
@@ -265,7 +271,7 @@ public class UserRepository implements IUserRepository {
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (taskSnapshot.getTask().isSuccessful()){
+                        if (taskSnapshot.getTask().isSuccessful()) {
                             imageRef.getDownloadUrl()
                                     .addOnSuccessListener(new OnSuccessListener<Uri>() {
                                         @Override
@@ -401,13 +407,13 @@ public class UserRepository implements IUserRepository {
     }
 
 
-    private void clearForProfilePicture(){
+    private void clearForProfilePicture() {
         progressDialogProfilePicture.dismiss();
         fragmentUserBinding.imageViewUserPicture.setImageResource(0);
         FragmentUser.clearProfilePictureUrl();
     }
 
-    private void clearForCoverPicture(){
+    private void clearForCoverPicture() {
         progressDialogCoverPicture.dismiss();
         FragmentUser.clearCoverPictureUrl();
         fragmentUserBinding.imageViewCoverPhoto.setImageResource(0);

@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentAddPost;
 import com.finki.courses.Fragments.FragmentGallery;
@@ -49,7 +50,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.ortiz.touchview.TouchImageView;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -352,10 +352,13 @@ public class FragmentHomeHelper {
             layoutParamsForImageView.setMargins(0, 0, 0, 0);
 
             ImageView imageViewPost = new ImageView(context);
-            if (postMap.get("imageUrl").equals(""))
+            if (postMap.get("imageUrl").equals("")){
                 imageViewPost.setImageResource(0);
-            else
-                Picasso.get().load(imageUri).into(imageViewPost);
+            } else {
+                Glide.with(context)
+                        .load(imageUri)
+                        .into(imageViewPost);
+            }
             imageViewPost.setLayoutParams(layoutParamsForImageView);
             imageViewPost.setScaleType(ImageView.ScaleType.CENTER_CROP);
 

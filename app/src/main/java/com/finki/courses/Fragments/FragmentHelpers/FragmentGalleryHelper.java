@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.ImageSliderFragment;
 import com.finki.courses.Helper.Implementations.Toaster;
@@ -50,7 +51,7 @@ public class FragmentGalleryHelper {
     }
 
     public void buildImages(List<Map<String, Object>> allPostsList) {
-        if (allPostsList.isEmpty()){
+        if (allPostsList.isEmpty()) {
             fragmentGalleryBinding.linearLayoutEmptyGalleryFragment.setVisibility(View.VISIBLE);
             return;
         }
@@ -88,7 +89,7 @@ public class FragmentGalleryHelper {
             @Override
             public void accept(LocalDate localDate, List<Map<String, Object>> maps) {
                 LinearLayout.LayoutParams layoutParamsTextViewTitle = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParamsTextViewTitle.setMargins(24,24,24,16);
+                layoutParamsTextViewTitle.setMargins(24, 24, 24, 16);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     @SuppressLint("DefaultLocale")
@@ -106,14 +107,14 @@ public class FragmentGalleryHelper {
 
 
                     LinearLayout.LayoutParams layoutParamsGridLayout = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    layoutParamsGridLayout.setMargins(halfMargin,0,halfMargin,48);
+                    layoutParamsGridLayout.setMargins(halfMargin, 0, halfMargin, 48);
                     layoutParamsGridLayout.gravity = Gravity.START;
 
                     GridLayout gridLayout = new GridLayout(context);
                     gridLayout.setColumnCount(4);
                     gridLayout.setLayoutParams(layoutParamsGridLayout);
 
-                    for (int i=0;i<maps.size();i++){
+                    for (int i = 0; i < maps.size(); i++) {
                         Map<String, Object> postMap = maps.get(i);
 
                         LinearLayout.LayoutParams layoutParamsImage = new LinearLayout.LayoutParams(imageSide, imageSide);
@@ -122,7 +123,9 @@ public class FragmentGalleryHelper {
                         Uri imageUri = Uri.parse(String.valueOf(postMap.get("imageUrl")));
 
                         ImageView imageView = new ImageView(context);
-                        Picasso.get().load(imageUri).into(imageView);
+                        Glide.with(context)
+                                .load(imageUri)
+                                .into(imageView);
                         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         imageView.setLayoutParams(layoutParamsImage);
                         int finalI = i;
@@ -141,7 +144,7 @@ public class FragmentGalleryHelper {
     }
 
     @SuppressLint("NewApi")
-    private LocalDate calculateDateFromPost(Map<String, Object> postMap){
+    private LocalDate calculateDateFromPost(Map<String, Object> postMap) {
         Map<String, Object> postedAtMap = (Map<String, Object>) postMap.get("postedAt");
 
         long dayOfMonth = (long) postedAtMap.get("dayOfMonth");

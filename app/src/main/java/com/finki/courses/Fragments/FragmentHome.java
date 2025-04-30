@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.FragmentHelpers.FragmentHomeHelper;
 import com.finki.courses.Helper.IEssentials;
@@ -28,6 +29,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.protobuf.GeneratedMessageLite;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -46,7 +48,7 @@ public class FragmentHome extends Fragment implements IEssentials {
         // Required empty public constructor
     }
 
-    public FragmentHome(MainActivityHelper mainActivityHelper){
+    public FragmentHome(MainActivityHelper mainActivityHelper) {
         this.mainActivityHelper = mainActivityHelper;
     }
 
@@ -75,7 +77,9 @@ public class FragmentHome extends Fragment implements IEssentials {
         String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         String profilePictureUrl = userRepository.loadProfilePictureFromCache(email);
         if (!profilePictureUrl.isEmpty()) {
-            Picasso.get().load(profilePictureUrl).into(binding.imageViewProfileFragmentHome);
+            Glide.with(getContext())
+                    .load(profilePictureUrl)
+                    .into(binding.imageViewProfileFragmentHome);
         }
     }
 

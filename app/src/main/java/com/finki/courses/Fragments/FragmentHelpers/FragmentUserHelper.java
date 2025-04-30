@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Fragments.ImageSliderFragment;
 import com.finki.courses.Helper.Implementations.Toaster;
@@ -63,7 +64,9 @@ public class FragmentUserHelper {
             layoutParams.setMargins(margin, margin, margin, margin);
 
             ImageView imageView = new ImageView(context);
-            Picasso.get().load(imageUri).into(imageView);
+            Glide.with(context)
+                    .load(imageUri)
+                    .into(imageView);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setLayoutParams(layoutParams);
             int finalI = i;
