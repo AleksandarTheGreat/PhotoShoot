@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.FragmentSingleImage">
 
-    <com.ortiz.touchview.TouchImageView
-        android:id="@+id/touchImageViewFragmentSingleImage"
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/photoViewFragmentSingleImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@mipmap/ic_launcher"

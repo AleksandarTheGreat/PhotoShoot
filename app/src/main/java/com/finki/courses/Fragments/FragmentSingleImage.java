@@ -62,10 +62,9 @@ public class FragmentSingleImage extends Fragment implements IEssentials {
         toaster = new Toaster(getContext());
 
         String imageUri = (String) postMap.get("imageUrl");
-        Uri uri = Uri.parse(imageUri);
         Glide.with(getContext())
-                .load(uri)
-                .into(binding.touchImageViewFragmentSingleImage);
+                .load(imageUri)
+                .into(binding.photoViewFragmentSingleImage);
 
         Log.d("Tag", imageUri);
     }
@@ -73,13 +72,7 @@ public class FragmentSingleImage extends Fragment implements IEssentials {
     @SuppressLint("NewApi")
     @Override
     public void addEventListeners() {
-        // Cannot disable viewPager2 from scrolling
-        binding.touchImageViewFragmentSingleImage.setOnTouchImageViewListener(new TouchImageView.OnTouchImageViewListener() {
-            @Override
-            public void onMove() {
 
-            }
-        });
     }
 
     @Override
