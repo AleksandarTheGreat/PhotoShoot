@@ -1,6 +1,7 @@
 package com.finki.courses.Fragments;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.finki.courses.Activities.ActivityHelpers.MainActivityHelper;
 import com.finki.courses.Helper.IEssentials;
@@ -178,11 +180,16 @@ public class FragmentAddPost extends Fragment implements IEssentials {
         try {
             InputStream inputStream = getContext().getContentResolver().openInputStream(pickedImageUri);
             if (inputStream != null) {
+
+                ProgressDialog progressDialog = new ProgressDialog(getContext());
+                progressDialog.setTitle("Adding post...");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+
                 viewModelPosts.uploadImage(category, inputStream, new OnPostAddedCallback() {
                     @Override
                     public void onPostAdded(long categoryId, Post post, boolean addedSuccessfully) {
                         if (addedSuccessfully){
-
                             // somehow wait for all the images to be uploaded before going to fragment home,
                             // but that is not the major task right now.
 
@@ -201,6 +208,8 @@ public class FragmentAddPost extends Fragment implements IEssentials {
                             binding.imageViewAdd.setVisibility(View.VISIBLE);
                             binding.imageViewPickedImage.setImageResource(0);
                         }
+
+                        progressDialog.dismiss();
                     }
                 });
             } else {

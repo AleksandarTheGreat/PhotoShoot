@@ -1,6 +1,7 @@
 package com.finki.courses.Fragments.FragmentHelpers;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -51,8 +52,6 @@ public class FragmentHomeHelper {
     private ViewModelCategories viewModelCategories;
     private ViewModelPosts viewModelPosts;
 
-    private CategoryRepository categoryRepository;
-    private PostRepository postRepository;
     private Toaster toaster;
     private boolean isNightModeOn;
 
@@ -64,10 +63,7 @@ public class FragmentHomeHelper {
         this.viewModelPosts = viewModelPosts;
         this.mainActivityHelper = mainActivityHelper;
 
-        this.postRepository = new PostRepository(context, mainActivityHelper);
         this.toaster = new Toaster(context);
-        this.categoryRepository = viewModelCategories.getCategoryRepository();
-
         this.isNightModeOn = ThemeUtils.isNightModeOn(context);
     }
 
@@ -88,6 +84,11 @@ public class FragmentHomeHelper {
                         if (text.isEmpty())
                             return;
 
+                        ProgressDialog progressDialog = new ProgressDialog(context);
+                        progressDialog.setTitle("Adding category...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+
                         viewModelCategories.add(text, new OnCategoryAddedCallback() {
                             @Override
                             public void onCategoryAdded(boolean addedSuccessfully, Category category) {
@@ -97,6 +98,8 @@ public class FragmentHomeHelper {
 
                                     viewModelCategories.getMutableLiveDataCategories().setValue(categories);
                                 }
+
+                                progressDialog.cancel();
                             }
                         });
                     }
@@ -186,6 +189,11 @@ public class FragmentHomeHelper {
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            ProgressDialog progressDialog = new ProgressDialog(context);
+                            progressDialog.setTitle("Deleting category...");
+                            progressDialog.setCancelable(false);
+                            progressDialog.show();
+
                             viewModelCategories.deleteById(category.getId(), new OnCategoryDeletedCallback() {
                                 @Override
                                 public void onCategoryDeleted(boolean deletedSuccessfully, long id) {
@@ -195,6 +203,8 @@ public class FragmentHomeHelper {
 
                                         viewModelCategories.getMutableLiveDataCategories().setValue(categories);
                                     }
+
+                                    progressDialog.cancel();
                                 }
                             });
                         }
@@ -333,14 +343,20 @@ public class FragmentHomeHelper {
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    ProgressDialog progressDialog = new ProgressDialog(context);
+                                    progressDialog.setTitle("Deleting post...");
+                                    progressDialog.setCancelable(true);
+                                    progressDialog.show();
+
                                     long postId = Long.parseLong(String.valueOf(postMap.get("id")));
-                                    // Here
                                     viewModelPosts.deleteById(category.getId(), postId, new OnPostDeletedCallback() {
                                         @Override
                                         public void onPostDeleted(boolean deletedSuccessfully) {
                                             if (deletedSuccessfully) {
                                                 viewModelCategories.listAll(categories -> viewModelCategories.getMutableLiveDataCategories().setValue(categories));
                                             }
+
+                                            progressDialog.dismiss();
                                         }
                                     });
                                 }

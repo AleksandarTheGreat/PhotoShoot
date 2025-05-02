@@ -1,5 +1,6 @@
 package com.finki.courses.Fragments;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -71,17 +72,25 @@ public class FragmentHome extends Fragment implements IEssentials {
         viewModelCategories.getMutableLiveDataCategories().observe(getViewLifecycleOwner(), new Observer<List<Category>>() {
             @Override
             public void onChanged(List<Category> categories) {
+                binding.linearLayoutCategories.removeAllViews();
                 if (!categories.isEmpty()) {
 
-                    binding.linearLayoutCategories.removeAllViews();
+                    ProgressDialog progressDialog = new ProgressDialog(getContext());
+                    progressDialog.setTitle("Loading...");
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+
                     fragmentHomeHelper.showScrollViewAndHideLinearLayout();
 
                     for (Category category : categories) {
                         fragmentHomeHelper.buildUILayoutForCategory(category);
                     }
 
+                    progressDialog.cancel();
+
                     toaster.text("Built the UI, not from firebase");
                     Log.d("Tag", "All categories are : " + categories);
+
                 } else {
                     fragmentHomeHelper.hideScrollViewAndShowLinearLayout();
                 }
