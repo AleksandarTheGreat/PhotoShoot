@@ -35,7 +35,6 @@ public class FragmentHome extends Fragment implements IEssentials {
     private Toaster toaster;
     private FragmentHomeHelper fragmentHomeHelper;
     private MainActivityHelper mainActivityHelper;
-    private CategoryRepository categoryRepository;
     private boolean isNightModeOn;
     private UserRepository userRepository;
 
@@ -88,9 +87,7 @@ public class FragmentHome extends Fragment implements IEssentials {
 
                     progressDialog.cancel();
 
-                    toaster.text("Built the UI, not from firebase");
-                    Log.d("Tag", "All categories are : " + categories);
-
+                    Log.d("Tag", "This is the UI part in fragment home");
                 } else {
                     fragmentHomeHelper.hideScrollViewAndShowLinearLayout();
                 }

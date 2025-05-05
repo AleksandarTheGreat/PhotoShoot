@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,9 +25,11 @@ import com.finki.courses.Fragments.FragmentHelpers.FragmentUserHelper;
 import com.finki.courses.Helper.IEssentials;
 import com.finki.courses.Helper.Implementations.Toaster;
 import com.finki.courses.R;
+import com.finki.courses.Repositories.Callbacks.Category.OnPostsListedCallback;
 import com.finki.courses.Repositories.Implementations.AuthenticationRepository;
 import com.finki.courses.Repositories.Implementations.PostRepository;
 import com.finki.courses.Repositories.Implementations.UserRepository;
+import com.finki.courses.ViewModel.ViewModelCategories;
 import com.finki.courses.databinding.FragmentUserBinding;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -37,6 +40,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import kotlin.Result;
 
@@ -50,7 +55,8 @@ public class FragmentUser extends Fragment implements IEssentials {
     private AuthenticationRepository authenticationRepository;
 
     private FragmentUserHelper fragmentUserHelper;
-    private PostRepository postRepository;
+
+    private ViewModelCategories viewModelCategories;
 
     private static int PROFILE_PIC_REQ_CODE = 2;
     private static int COVER_PIC_REQ_CODE = 3;
@@ -88,8 +94,17 @@ public class FragmentUser extends Fragment implements IEssentials {
 
         fragmentUserHelper = new FragmentUserHelper(getContext(), binding);
 
-        postRepository = new PostRepository(getContext(), mainActivityHelper);
-        postRepository.listAllForUser(fragmentUserHelper);
+        viewModelCategories = new ViewModelProvider(getActivity()).get(ViewModelCategories.class);
+        viewModelCategories.listAllPosts(new OnPostsListedCallback() {
+            @Override
+            public void onListed(List<Map<String, Object>> list) {
+                if (!list.isEmpty()){
+                    fragmentUserHelper.buildImages(mainActivityHelper, list);
+                } else {
+                    toaster.text("Somehow posts are null");
+                }
+            }
+        });
 
         String email = firebaseAuth.getCurrentUser().getEmail();
         userRepository = new UserRepository(getContext(), binding);

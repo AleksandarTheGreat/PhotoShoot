@@ -34,7 +34,7 @@ public class FragmentUserHelper {
     }
 
     @SuppressLint("SetTextI18n")
-    public void buildImages(MainActivityHelper mainActivityHelper, List<Map<String, Object>> cateogryList, List<Map<String, Object>> postList) {
+    public void buildImages(MainActivityHelper mainActivityHelper, List<Map<String, Object>> postList) {
         if (postList.isEmpty()) {
             fragmentUserBinding.linearLayoutEmptyUserFragment.setVisibility(View.VISIBLE);
             fragmentUserBinding.gridLayoutPostsUserFragment.setVisibility(View.GONE);
@@ -43,8 +43,6 @@ public class FragmentUserHelper {
         fragmentUserBinding.linearLayoutEmptyUserFragment.setVisibility(View.GONE);
         fragmentUserBinding.gridLayoutPostsUserFragment.setVisibility(View.VISIBLE);
 
-
-        fragmentUserBinding.textViewTotalCategories.setText(cateogryList.size() + " categories.");
         fragmentUserBinding.textViewTotalPosts.setText(postList.size() + " posts.");
 
         int windowWidth = context.getResources().getDisplayMetrics().widthPixels;

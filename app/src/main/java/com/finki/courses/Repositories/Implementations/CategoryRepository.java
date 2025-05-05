@@ -11,6 +11,7 @@ import com.finki.courses.Model.Post;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoriesLoadedCallBack;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoryAddedCallback;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoryDeletedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnPostsListedCallback;
 import com.finki.courses.Repositories.ICategoriesRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -289,6 +290,16 @@ public class CategoryRepository implements ICategoriesRepository {
                         onCategoryDeletedCallback.onCategoryDeleted(false, id);
                     }
                 });
+    }
+
+    @Override
+    public void listAllPosts(OnPostsListedCallback onPostsListedCallback){
+        List<Map<String, Object>> allPosts = new ArrayList<>();
+        for (Category category: categoryList){
+            allPosts.addAll(category.getPostList());
+        }
+
+        onPostsListedCallback.onListed(allPosts);
     }
 
     public List<Category> getCategoryList() {

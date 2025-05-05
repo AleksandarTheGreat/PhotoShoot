@@ -45,14 +45,4 @@ public class ViewModelPosts extends ViewModel implements IPostRepository {
     public void deleteById(long categoryId, long postId, OnPostDeletedCallback onPostDeletedCallback) {
         postRepository.deleteById(categoryId, postId, onPostDeletedCallback);
     }
-
-    @Override
-    public void listAllForGallery(FragmentGalleryHelper fragmentGalleryHelper) {
-
-    }
-
-    @Override
-    public void listAllForUser(FragmentUserHelper fragmentUserHelper) {
-
-    }
 }

@@ -9,6 +9,7 @@ import com.finki.courses.Model.Category;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoriesLoadedCallBack;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoryAddedCallback;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoryDeletedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnPostsListedCallback;
 import com.finki.courses.Repositories.ICategoriesRepository;
 import com.finki.courses.Repositories.Implementations.CategoryRepository;
 
@@ -43,6 +44,11 @@ public class ViewModelCategories extends ViewModel implements ICategoriesReposit
     @Override
     public void deleteById(long id, OnCategoryDeletedCallback onCategoryDeletedCallback) {
         categoryRepository.deleteById(id, onCategoryDeletedCallback);
+    }
+
+    @Override
+    public void listAllPosts(OnPostsListedCallback onPostsListedCallback) {
+        categoryRepository.listAllPosts(onPostsListedCallback);
     }
 
     public MutableLiveData<List<Category>> getMutableLiveDataCategories() {

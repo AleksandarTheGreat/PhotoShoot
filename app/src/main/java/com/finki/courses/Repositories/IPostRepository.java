@@ -16,6 +16,4 @@ public interface IPostRepository {
     void add(long categoryId, Post post, OnPostAddedCallback onPostAddedCallback);
     void uploadImage(Category category, InputStream inputStream, OnPostAddedCallback onPostAddedCallback);
     void deleteById(long categoryId, long postId, OnPostDeletedCallback onPostDeletedCallback);
-    void listAllForGallery(FragmentGalleryHelper fragmentGalleryHelper);
-    void listAllForUser(FragmentUserHelper fragmentUserHelper);
 }

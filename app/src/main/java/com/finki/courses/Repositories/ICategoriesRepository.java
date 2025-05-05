@@ -4,6 +4,7 @@ import com.finki.courses.Model.Category;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoriesLoadedCallBack;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoryAddedCallback;
 import com.finki.courses.Repositories.Callbacks.Category.OnCategoryDeletedCallback;
+import com.finki.courses.Repositories.Callbacks.Category.OnPostsListedCallback;
 
 public interface ICategoriesRepository {
 
@@ -11,4 +12,5 @@ public interface ICategoriesRepository {
     Category findCategoryById(long id);
     void add(String name, OnCategoryAddedCallback onCategoryAddedCallback);
     void deleteById(long id, OnCategoryDeletedCallback onCategoryDeletedCallback);
+    void listAllPosts(OnPostsListedCallback onPostsListedCallback);
 }

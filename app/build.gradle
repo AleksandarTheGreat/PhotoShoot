@@ -48,7 +48,6 @@ dependencies {
     // ViewModel and LiveData
     implementation libs.lifecycle.viewmodel
     implementation libs.lifecycle.livedata
-
     // photoview
     implementation libs.chrisbanes.photoview
 

@@ -85,7 +85,7 @@ public class MainActivity extends ParentActivity {
             @Override
             public void onLoaded(List<Category> categories) {
                 viewModelCategories.getMutableLiveDataCategories().setValue(categories);
-                toaster.text("Loaded all from firebase just ONCE");
+                toaster.text("Loaded all from firebase");
             }
         });
 
